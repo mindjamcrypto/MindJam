@@ -4,16 +4,26 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Crossword from "@jaredreisinger/react-crossword";
 import { crosswordList } from "../constants/dummyData/crosswordList";
-import { CluesInputOriginal } from "@jaredreisinger/react-crossword/dist/types";
+import {
+  CluesInputOriginal,
+  ClueTypeOriginal,
+} from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
+
 type CrosswordParams = {
   id: string;
 };
+type CluesInputWithTitle = {
+  title: string;
+  across: Record<string, ClueTypeOriginal>;
+  down: Record<string, ClueTypeOriginal>;
+};
+
 function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
   const [loading, setLoading] = useState(true);
-  const [crosswordData, setCrosswordData] = useState<CluesInputOriginal>();
+  const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
   useEffect(() => {
     async function fetchData() {
       try {
@@ -27,7 +37,7 @@ function CrosswordPuzzle() {
     fetchData();
   }, [id]);
   if (loading) {
-    return <Box>Loading!</Box>;
+    return <Loading />;
   } else {
     if (crosswordData) {
       return (
@@ -43,7 +53,7 @@ function CrosswordPuzzle() {
                   }}
                   letterSpacing="6px"
                 >
-                  Title
+                  {crosswordData.title}
                 </Heading>
               </Flex>
               <Crossword data={crosswordData!} />

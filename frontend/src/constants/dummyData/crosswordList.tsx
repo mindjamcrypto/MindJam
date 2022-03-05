@@ -1,5 +1,6 @@
 export const crosswordList = [
   {
+    title: "Puzzle 1",
     across: {
       1: {
         clue: "one plus one",
@@ -24,6 +25,7 @@ export const crosswordList = [
     },
   },
   {
+    title: "Puzzle 2",
     across: {
       1: {
         clue: "The Glass Menagerie (1945)",
@@ -48,6 +50,7 @@ export const crosswordList = [
     },
   },
   {
+    title: "Puzzle 3",
     across: {
       1: {
         clue: "The Glass Menagerie (1945)",
@@ -72,6 +75,7 @@ export const crosswordList = [
     },
   },
   {
+    title: "Puzzle 4",
     across: {
       1: {
         clue: "The Glass Menagerie (1945)",
