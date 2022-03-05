@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract Game {
+    // Holds the main data about each session
     struct Session {
         address player;
         uint256 timestamp;
@@ -10,9 +11,15 @@ contract Game {
     }
 
     Session[] sessions;
+    // Couples a player's address to his last session
     mapping(address => uint256) playerLastSessionId;
+
+    // Prices for showing hints and revealing words
+    // defined in the constructor, can be later changed with set functions
     uint256 hintPrice;
     uint256 wordRevealPrice;
+
+    // Owner of the contract, can change prices and withdraw funds
     address owner;
 
     event NewSessionStarted(address from, uint256 sessionId);
@@ -25,6 +32,7 @@ contract Game {
         _;
     }
 
+    // Sets the prices and the owner
     constructor(uint256 _hintPrice, uint256 _wordRevealPrice) {
         hintPrice = _hintPrice;
         wordRevealPrice = _wordRevealPrice;
@@ -47,6 +55,9 @@ contract Game {
         emit NewSessionStarted(msg.sender, session.id);
     }
 
+    /*
+     * Functions called from the frontend when the player wants hints or word revealed
+     */
     function requestHint(uint256 _sessionId) public payable {
         Session memory session = sessions[_sessionId]; // gas saver
         require(
@@ -85,7 +96,7 @@ contract Game {
         require(session.active, "The session has already ended!");
         require(
             session.player == msg.sender,
-            "Only the player can terminate the session"
+            "Only the player can terminate the session" // QUESTION: does the player terminate the session or the onwer??
         );
 
         sessions[_sessionId].active = false;
@@ -140,7 +151,7 @@ contract Game {
         return playerLastSessionId[_player];
     }
 
-    // Withdraw the funds
+    // Withdraw the funds to specified address
     function withdraw(address payable _to) public onlyOwner {
         (bool sent, ) = _to.call{value: address(this).balance}("");
         require(sent, "Transaction failed!");
