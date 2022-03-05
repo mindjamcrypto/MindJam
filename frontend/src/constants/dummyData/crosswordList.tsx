@@ -1,4 +1,4 @@
-export const crosswordData = [
+export const crosswordList = [
   {
     across: {
       1: {

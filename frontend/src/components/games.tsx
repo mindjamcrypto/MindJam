@@ -10,7 +10,7 @@ import {
   GridItem,
 } from "@chakra-ui/react";
 import Crossword from "@jaredreisinger/react-crossword";
-import { crosswordData } from "../constants/dummyData/crosswordData";
+import { crosswordList } from "../constants/dummyData/crosswordList";
 
 export const Games = () => {
   return (
