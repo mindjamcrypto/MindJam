@@ -29,7 +29,7 @@ contract Game {
     }
 
     /*
-     * Starts a new sessione and registers the timestamp at which the game started
+     * Starts a new session and registers the timestamp at which the game started
      * to later calculate how much time it takes the player to finish the game
      */
     function startSession() public {
