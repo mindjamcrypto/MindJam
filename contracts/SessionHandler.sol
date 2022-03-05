@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./MindJam.sol";
+import "./Crossword.sol";
+
 contract SessionHandler {
     // Holds the main data about each session
     struct Session {
@@ -10,15 +13,8 @@ contract SessionHandler {
         bool active;
     }
 
-    struct Crossword {
-        uint256 hintPrice;
-        uint256 wordPrice;
-        uint256 creationTimestamp;
-        uint256 id;
-    }
-
+    MindJam public mjToken;
     Session[] public sessions;
-    Crossword[] public crosswords;
     // Couples a player's address to his last session
     mapping(address => uint256) public playerLastSessionId;
 
@@ -27,8 +23,6 @@ contract SessionHandler {
 
     event NewSessionStarted(address from, uint256 sessionId);
     event SessionEnded(address from, uint256 sessionId);
-    event RequestHint(address from, uint256 sessionId);
-    event RequestWordReveal(address from, uint256 sessionId);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "You're not the owner of the contract");
@@ -43,8 +37,9 @@ contract SessionHandler {
         _;
     }
 
-    // Sets the prices and the owner
-    constructor() {
+    // Sets the owner and the MindJam token address
+    constructor(address _tokenAddress) {
+        mjToken = MindJam(_tokenAddress);
         owner = msg.sender;
     }
 
@@ -52,7 +47,7 @@ contract SessionHandler {
      * Starts a new session and registers the timestamp at which the game started
      * to later calculate how much time it takes the player to finish the game
      */
-    function startSession() public {
+    function startSession(uint256 _gameId) public {
         Session memory session = Session(
             msg.sender,
             block.timestamp,
@@ -79,18 +74,8 @@ contract SessionHandler {
         sessions[_sessionId].active = false;
         timeTaken = block.timestamp - session.timestamp;
         emit SessionEnded(msg.sender, _sessionId);
-    }
 
-    // Request an hint
-    function requestHint(uint256 _sessionId) public onlyPlayer(_sessionId) {
-        // TODO: make token payment
-        emit RequestHint(msg.sender, _sessionId);
-    }
-
-    // Request a word reveal
-    function requestWord(uint256 _sessionId) public onlyPlayer(_sessionId) {
-        // TODO: make token payment
-        emit RequestWordReveal(msg.sender, _sessionId);
+        // TODO: check for challenge, send eventual reward
     }
 
     // Some helper methods

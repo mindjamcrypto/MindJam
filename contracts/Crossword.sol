@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./MindJam.sol";
+
 /**
  * @title Handler of the crossword-type games
  * @dev This is to be used to create new crossword games
  */
 contract Crosswords {
     address public owner;
+    MindJam public mjToken;
 
     struct Crossword {
         uint256 hintPrice;
@@ -21,8 +24,12 @@ contract Crosswords {
         _;
     }
 
-    constructor() {
+    event RequestHint(address from, uint256 crosswordId);
+    event RequestWordReveal(address from, uint256 crosswordId);
+
+    constructor(address _tokenAddress) {
         owner = msg.sender;
+        mjToken = MindJam(_tokenAddress);
     }
 
     /**
@@ -44,6 +51,43 @@ contract Crosswords {
             )
         );
         return crosswords.length - 1;
+    }
+
+    /**
+     * Requests an hint
+     * @param _id the id of the crossword for which the hint is requested
+     */
+    function requestHint(uint256 _id) public {
+        uint256 price = crosswords[_id].hintPrice;
+
+        // Check for allowance
+        require(
+            mjToken.allowance(msg.sender, address(this)) >= price,
+            "Token spending not allowed!"
+        );
+
+        // Make the payment
+        bool sent = mjToken.transferFrom(msg.sender, address(this), price);
+        require(sent, "Payment failed!");
+
+        emit RequestHint(msg.sender, _id);
+    }
+
+    // Request a word reveal
+    function requestWord(uint256 _id) public {
+        uint256 price = crosswords[_id].wordPrice;
+
+        // Check for allowance
+        require(
+            mjToken.allowance(msg.sender, address(this)) >= price,
+            "Token spending not allowed"
+        );
+
+        // Make the payment
+        bool sent = mjToken.transferFrom(msg.sender, address(this), price);
+        require(sent, "Payment failed!");
+
+        emit RequestWordReveal(msg.sender, _id);
     }
 
     /**
