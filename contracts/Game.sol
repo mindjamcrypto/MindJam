@@ -141,8 +141,8 @@ contract Game {
     }
 
     // Withdraw the funds
-    function withdraw(uint256 _amount, address payable _to) public onlyOwner {
-        (bool sent, ) = _to.call{value: _amount}("");
+    function withdraw(address payable _to) public onlyOwner {
+        (bool sent, ) = _to.call{value: address(this).balance}("");
         require(sent, "Transaction failed!");
     }
 }
