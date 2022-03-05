@@ -1,17 +1,12 @@
-// @ts-nocheck
-import React from "react";
 import {
   Box,
-  HStack,
   Button,
-  VStack,
   Flex,
   Grid,
   GridItem,
   Link,
   Heading,
 } from "@chakra-ui/react";
-import Crossword from "@jaredreisinger/react-crossword";
 import { crosswordList } from "../constants/dummyData/crosswordList";
 
 export const Games = () => {

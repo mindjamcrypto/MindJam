@@ -1,13 +1,18 @@
 import React from "react";
-import { Box, Flex, Heading, HStack, VStack, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  HStack,
+  VStack,
+  Button,
+  Center,
+} from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Crossword from "@jaredreisinger/react-crossword";
 import { crosswordList } from "../constants/dummyData/crosswordList";
-import {
-  CluesInputOriginal,
-  ClueTypeOriginal,
-} from "@jaredreisinger/react-crossword/dist/types";
+import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
 
@@ -23,7 +28,13 @@ type CluesInputWithTitle = {
 function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
   const [loading, setLoading] = useState(true);
+  const [sessionStart, setSessionStart] = useState(false);
   const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
+
+  const handleBeginSession = async () => {
+    //TODO make a call to the smart contract to start the session
+    setSessionStart(true);
+  };
   useEffect(() => {
     async function fetchData() {
       try {
@@ -34,9 +45,18 @@ function CrosswordPuzzle() {
         return <Error />;
       }
     }
-    fetchData();
-  }, [id]);
-  if (loading) {
+    if (sessionStart) {
+      fetchData();
+    }
+  }, [id, sessionStart]);
+
+  if (!sessionStart) {
+    return (
+      <Flex justifyContent="center" alignItems="center" height="800px">
+        <Button onClick={handleBeginSession}>Begin Session</Button>
+      </Flex>
+    );
+  } else if (loading) {
     return <Loading />;
   } else {
     if (crosswordData) {
@@ -63,8 +83,6 @@ function CrosswordPuzzle() {
                 <VStack>
                   <Button> Check word</Button>
                   <Button> Check Puzzle</Button>
-                </VStack>
-                <Flex justifyContent="center" alignItems="center">
                   <Heading
                     fontSize={{
                       base: 10, // 0-48em
@@ -77,8 +95,6 @@ function CrosswordPuzzle() {
                   >
                     Get Help
                   </Heading>
-                </Flex>
-                <VStack>
                   <Button> Get a Hint</Button>
                   <Button> Reveal Square</Button>
                   <Button> Reveal Word</Button>
