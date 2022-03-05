@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Game {
+contract SessionHandler {
     // Holds the main data about each session
     struct Session {
         address player;
@@ -10,17 +10,20 @@ contract Game {
         bool active;
     }
 
-    Session[] sessions;
-    // Couples a player's address to his last session
-    mapping(address => uint256) playerLastSessionId;
+    struct Crossword {
+        uint256 hintPrice;
+        uint256 wordPrice;
+        uint256 creationTimestamp;
+        uint256 id;
+    }
 
-    // Prices for showing hints and revealing words
-    // defined in the constructor, can be later changed with set functions
-    uint256 hintPrice;
-    uint256 wordRevealPrice;
+    Session[] public sessions;
+    Crossword[] public crosswords;
+    // Couples a player's address to his last session
+    mapping(address => uint256) public playerLastSessionId;
 
     // Owner of the contract, can change prices and withdraw funds
-    address owner;
+    address public owner;
 
     event NewSessionStarted(address from, uint256 sessionId);
     event SessionEnded(address from, uint256 sessionId);
@@ -28,14 +31,20 @@ contract Game {
     event RequestWordReveal(address from, uint256 sessionId);
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "You're not the owner of the contract");
+        _;
+    }
+
+    modifier onlyPlayer(uint256 _sessionId) {
+        require(
+            msg.sender == sessions[_sessionId].player,
+            "You are not the player of this session!"
+        );
         _;
     }
 
     // Sets the prices and the owner
-    constructor(uint256 _hintPrice, uint256 _wordRevealPrice) {
-        hintPrice = _hintPrice;
-        wordRevealPrice = _wordRevealPrice;
+    constructor() {
         owner = msg.sender;
     }
 
@@ -56,52 +65,32 @@ contract Game {
     }
 
     /*
-     * Functions called from the frontend when the player wants hints or word revealed
-     */
-    function requestHint(uint256 _sessionId) public payable {
-        Session memory session = sessions[_sessionId]; // gas saver
-        require(
-            session.player == msg.sender,
-            "Only the player can request hints!"
-        );
-        require(session.active, "This session has ended");
-        require(
-            msg.value >= hintPrice,
-            "Insufficient amount to cover hint cost"
-        );
-
-        emit RequestHint(msg.sender, _sessionId);
-    }
-
-    function requestWordReveal(uint256 _sessionId) public payable {
-        Session memory session = sessions[_sessionId]; // gas saver
-        require(
-            session.player == msg.sender,
-            "Only the player can request hints!"
-        );
-        require(session.active, "This session has ended");
-        require(
-            msg.value >= wordRevealPrice,
-            "Insufficient amount to cover word reveal cost"
-        );
-
-        emit RequestWordReveal(msg.sender, _sessionId);
-    }
-
-    /*
      * Ends the game session provided and calculates the total time taken to finish
+     * @dev only the owner can call this function
      */
-    function endSession(uint256 _sessionId) public returns (uint256 timeTaken) {
+    function endSession(uint256 _sessionId)
+        public
+        onlyOwner
+        returns (uint256 timeTaken)
+    {
         Session memory session = sessions[_sessionId]; // gas saver
         require(session.active, "The session has already ended!");
-        require(
-            session.player == msg.sender,
-            "Only the player can terminate the session" // QUESTION: does the player terminate the session or the onwer??
-        );
 
         sessions[_sessionId].active = false;
         timeTaken = block.timestamp - session.timestamp;
         emit SessionEnded(msg.sender, _sessionId);
+    }
+
+    // Request an hint
+    function requestHint(uint256 _sessionId) public onlyPlayer(_sessionId) {
+        // TODO: make token payment
+        emit RequestHint(msg.sender, _sessionId);
+    }
+
+    // Request a word reveal
+    function requestWord(uint256 _sessionId) public onlyPlayer(_sessionId) {
+        // TODO: make token payment
+        emit RequestWordReveal(msg.sender, _sessionId);
     }
 
     // Some helper methods
@@ -133,14 +122,6 @@ contract Game {
         timestamp = session.timestamp;
         id = session.id;
         active = session.active;
-    }
-
-    function setHintPrice(uint256 _price) public onlyOwner {
-        hintPrice = _price;
-    }
-
-    function setWordRevealPrice(uint256 _price) public onlyOwner {
-        wordRevealPrice = _price;
     }
 
     function getPlayerLastSessionId(address _player)
