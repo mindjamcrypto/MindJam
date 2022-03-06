@@ -14,6 +14,8 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MindJam is ERC20, Pausable, Ownable {
+    event HintRequested(uint256 amountPayed, address from);
+
     constructor() ERC20("MindJam", "MINDJAM") {
         _mint(msg.sender, 10000000 * 10**decimals());
     }
@@ -50,5 +52,20 @@ contract MindJam is ERC20, Pausable, Ownable {
     {
         require(amount <= balanceOf(owner()), "Amount exceeds balance");
         transfer(winner, amount * 10**decimals()); //Emits a transfer event
+    }
+
+    /**
+     * @dev Requests an hint by paying some tokens
+     */
+    function requestHint(uint256 _tokenAmount, address _from) public onlyOwner {
+        // Check that there's enough allowance for token spending
+        require(
+            allowance(_from, address(this)) >= _tokenAmount,
+            "You need to approved token spending first!"
+        );
+
+        bool sent = transferFrom(_from, address(this), _tokenAmount);
+        require(sent, "Transaction failed!");
+        emit HintRequested(_tokenAmount, _from);
     }
 }
