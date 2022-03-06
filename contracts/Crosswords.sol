@@ -156,7 +156,14 @@ contract Crosswords is ReentrancyGuard {
         require(!crossword.winnerPaid, "The winner has already been paid!");
 
         crosswords[_id].winnerPaid = true;
-        bool sent = mjToken.mint(crossword.winner, crossword.challengePrize);
-        require(sent, "Transaction failed!");
+        mjToken.payWinner(crossword.winner, crossword.challengePrize);
+    }
+
+    /**@dev Withdraw all the mJTokens to specified address
+     */
+    function withdraw(address _to) public onlyOwner {
+        uint256 balance = mjToken.balanceOf(address(this));
+        require(balance > 0, "No tokens to transfer");
+        mjToken.transfer(_to, balance);
     }
 }

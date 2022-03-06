@@ -157,8 +157,10 @@ contract SessionHandler {
 
     // Withdraw the funds to specified address
     // TODO withdraw tokens
-    function withdraw(address payable _to) public onlyOwner {
-        bool sent = mjToken.transfer(_to, mjToken.balanceOf(address(this)));
+    function withdraw(address _to) public onlyOwner {
+        uint256 balance = mjToken.balanceOf(address(this));
+        require(balance > 0, "No tokens to transfer!");
+        bool sent = mjToken.transfer(_to, balance);
         require(sent, "Transaction failed!");
     }
 }
