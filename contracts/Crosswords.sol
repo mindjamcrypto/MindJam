@@ -15,7 +15,7 @@ contract Crosswords is ReentrancyGuard {
     SessionHandler sessionHandler;
 
     struct Crossword {
-        uint256 hintPrice;
+        uint256 squarePrice;
         uint256 wordPrice;
         uint256 challengePrize; // amount of token to be minted for winning the challenge
         address winner; // current prize winner
@@ -39,7 +39,7 @@ contract Crosswords is ReentrancyGuard {
         _;
     }
 
-    event RequestHint(address from, uint256 crosswordId);
+    event RequestSquareReveal(address from, uint256 crosswordId);
     event RequestWordReveal(address from, uint256 crosswordId);
 
     constructor(address _tokenAddress, address _sessionHandlerAddress) {
@@ -50,19 +50,19 @@ contract Crosswords is ReentrancyGuard {
 
     /**
      * @dev Creates new crossword specifying the prices
-     * @param _hintPrice Number of tokens required to request an hint
+     * @param _squarePrice Number of tokens required to request an hint
      * @param _wordPrice Number of tokens required to reveal a word
      * @param _challengePrize Number of tokens to be minted to who wins the 24 hour challenge
      * @return id of the crossword
      */
     function newCrossword(
-        uint256 _hintPrice,
+        uint256 _squarePrice,
         uint256 _wordPrice,
         uint256 _challengePrize
     ) public returns (uint256) {
         crosswords.push(
             Crossword(
-                _hintPrice,
+                _squarePrice,
                 _wordPrice,
                 _challengePrize,
                 address(0), // winner addres initialized to 0
@@ -79,8 +79,8 @@ contract Crosswords is ReentrancyGuard {
      * Requests an hint
      * @param _id the id of the crossword for which the hint is requested
      */
-    function requestHint(uint256 _id) public {
-        uint256 price = crosswords[_id].hintPrice;
+    function requestSquare(uint256 _id) public {
+        uint256 price = crosswords[_id].squarePrice;
 
         // Check for allowance
         require(
@@ -92,7 +92,7 @@ contract Crosswords is ReentrancyGuard {
         bool sent = mjToken.transferFrom(msg.sender, address(this), price);
         require(sent, "Payment failed!");
 
-        emit RequestHint(msg.sender, _id);
+        emit RequestSquareReveal(msg.sender, _id);
     }
 
     // Request a word reveal
