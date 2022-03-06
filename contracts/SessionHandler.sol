@@ -2,11 +2,19 @@
 pragma solidity ^0.8.0;
 
 import "./MindJam.sol";
-import "./Crossword.sol";
+import "./Crosswords.sol";
 
 contract SessionHandler {
+    // All the different kinds of games
+    enum GameType {
+        CROSSWORD
+    }
+
     // Holds the main data about each session
     struct Session {
+        GameType gameType;
+        address gameContractAddress;
+        uint256 gameId;
         address player;
         uint256 timestamp;
         uint256 id;
@@ -23,6 +31,7 @@ contract SessionHandler {
 
     event NewSessionStarted(address from, uint256 sessionId);
     event SessionEnded(address from, uint256 sessionId);
+    event NewRecord(address player, uint256 crosswordId, uint256 time);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "You're not the owner of the contract");
@@ -43,12 +52,23 @@ contract SessionHandler {
         owner = msg.sender;
     }
 
-    /*
-     * Starts a new session and registers the timestamp at which the game started
-     * to later calculate how much time it takes the player to finish the game
+    /**
+     * @dev Starts a new session and registers the timestamp at which the game started
+     * @dev to later calculate how much time it takes the player to finish the game
+     * @param _gameType This refers to the enum GameType previously defined, the uint
+     * type is converted in the enum type (crossword is currently 0)
+     * @param _gameContractAddress The addres of the game contract
+     * @param _gameId The id that identifies the game in its own contract
      */
-    function startSession(uint256 _gameId) public {
+    function startSession(
+        uint256 _gameType,
+        address _gameContractAddress,
+        uint256 _gameId
+    ) public {
         Session memory session = Session(
+            GameType(_gameType),
+            _gameContractAddress,
+            _gameId,
             msg.sender,
             block.timestamp,
             sessions.length,
@@ -59,7 +79,7 @@ contract SessionHandler {
         emit NewSessionStarted(msg.sender, session.id);
     }
 
-    /*
+    /**
      * Ends the game session provided and calculates the total time taken to finish
      * @dev only the owner can call this function
      */
@@ -75,14 +95,26 @@ contract SessionHandler {
         timeTaken = block.timestamp - session.timestamp;
         emit SessionEnded(msg.sender, _sessionId);
 
-        // TODO: check for challenge, send eventual reward
+        // Checks for the 24 hour challenge
+        if (session.gameType == GameType.CROSSWORD) {
+            Crosswords crosswords = Crosswords(session.gameContractAddress); // Gets the instance of the crossword game
+            if (
+                crosswords.isChallengeOn(session.gameId) &&
+                crosswords.newTime(session.gameId, timeTaken, session.player)
+            ) {
+                emit NewRecord(session.player, session.gameId, timeTaken);
+            }
+        }
     }
 
     // Some helper methods
     function getLastSession()
-        public
+        external
         view
         returns (
+            uint256 gameType,
+            address gameContractAddress,
+            uint256 gameId,
             address player,
             uint256 timestamp,
             uint256 id,
@@ -96,6 +128,9 @@ contract SessionHandler {
         public
         view
         returns (
+            uint256 gameType,
+            address gameContractAddress,
+            uint256 gameId,
             address player,
             uint256 timestamp,
             uint256 id,
@@ -103,6 +138,9 @@ contract SessionHandler {
         )
     {
         Session memory session = sessions[_id];
+        gameType = uint256(session.gameType);
+        gameContractAddress = session.gameContractAddress;
+        gameId = session.gameId;
         player = session.player;
         timestamp = session.timestamp;
         id = session.id;
@@ -110,7 +148,7 @@ contract SessionHandler {
     }
 
     function getPlayerLastSessionId(address _player)
-        public
+        external
         view
         returns (uint256)
     {
@@ -118,8 +156,9 @@ contract SessionHandler {
     }
 
     // Withdraw the funds to specified address
+    // TODO withdraw tokens
     function withdraw(address payable _to) public onlyOwner {
-        (bool sent, ) = _to.call{value: address(this).balance}("");
+        bool sent = mjToken.transfer(_to, mjToken.balanceOf(address(this)));
         require(sent, "Transaction failed!");
     }
 }
