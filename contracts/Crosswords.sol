@@ -142,8 +142,15 @@ contract Crosswords is ReentrancyGuard {
         } else return false;
     }
 
+    /**@dev If the challenge is over, it returns the address of the winner
+     * @param _id the id of the crossword you want the winner of
+     */
+    function getWinner(uint256 _id) public view returns (address) {
+        return crosswords[_id].winner;
+    }
+
     /**
-    @dev This function is called by the frontend from the player's account to claim the winner's prize
+    @dev This function is called from the player's account to claim the winner's prize
     @param _id The identifier of the crossword
      */
     function payWinner(uint256 _id) public nonReentrant {
@@ -156,7 +163,7 @@ contract Crosswords is ReentrancyGuard {
         require(!crossword.winnerPaid, "The winner has already been paid!");
 
         crosswords[_id].winnerPaid = true;
-        mjToken.payWinner(crossword.winner, crossword.challengePrize);
+        mjToken.payWinner(msg.sender, crossword.challengePrize);
     }
 
     /**@dev Withdraw all the mJTokens to specified address
