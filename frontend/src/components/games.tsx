@@ -8,7 +8,7 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { crosswordList } from "../constants/dummyData/crosswordList";
-
+import { Link as ReactRouter } from "react-router-dom";
 export const Games = () => {
   return (
     <Box
@@ -39,7 +39,9 @@ export const Games = () => {
           {crosswordList.map((puzzle, i) => (
             <GridItem>
               <Button>
-                <Link href={`/crossword/${i}`}>{puzzle.title}</Link>
+                <Link as={ReactRouter} to={`/crossword/${i}`}>
+                  {puzzle.title}
+                </Link>
               </Button>
             </GridItem>
           ))}

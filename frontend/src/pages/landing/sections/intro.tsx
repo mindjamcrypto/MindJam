@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text, Flex, Heading, Link } from "@chakra-ui/react";
-
+import { Link as ReactRouter } from "react-router-dom";
 export const Intro = () => {
   return (
     <Box
@@ -51,7 +51,8 @@ export const Intro = () => {
             textDecoration: "none",
             bg: "whiteAlpha.900",
           }}
-          href={"/games"}
+          as={ReactRouter}
+          to={"/games"}
         >
           Start playing now!
         </Link>
