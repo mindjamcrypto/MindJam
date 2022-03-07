@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan")
 require("dotenv").config()
 
 // The next line is part of the sample project, you don't need it in your
@@ -26,5 +27,8 @@ module.exports = {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
       accounts: [process.env.PRIVATE_KEY]
     }
+  },
+  etherscan: {
+    apiKey: `${process.env.POLYGONSCAN_KEY}`
   }
 };
