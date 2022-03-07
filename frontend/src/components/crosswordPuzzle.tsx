@@ -1,11 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Crossword, {
   CrosswordImperative,
-  CrosswordGrid,
-  CrosswordProvider,
-  CrosswordProviderImperative,
-  DirectionClues,
-  AnswerTuple,
 } from "@jaredreisinger/react-crossword";
 import {
   Box,
@@ -14,9 +9,15 @@ import {
   HStack,
   VStack,
   Button,
-  Center,
+  FormControl,
+  NumberInputField,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputStepper,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
+
 import { crosswordList } from "../constants/dummyData/crosswordList";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
@@ -33,24 +34,62 @@ type CluesInputWithTitle = {
 
 function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
+  const crossword = useRef<CrosswordImperative>(null);
   const [loading, setLoading] = useState(true);
   const [sessionStart, setSessionStart] = useState(true);
   const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
   const [isCorrect, setIsCorrectValue] = useState(false);
+  const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
+  const [checkWordId, setCheckWordId] = useState("");
 
-  const onCrosswordCorrectProvider = useCallback((isCorrect: boolean) => {
+  const onCrosswordCorrect = useCallback((isCorrect: boolean) => {
     // console.log(isCorrect);
     const endTime = Date.now();
     //TODO Add session end time ^ to database with the User Address
-    console.log(endTime);
     setIsCorrectValue(isCorrect);
   }, []);
+
+  const onCorrect = useCallback((direction, number, answer) => {
+    setCorrectWordArray([...correctWordArray, number]);
+    console.log(`onCorrect: "${direction}", "${number}", "${answer}"`);
+  }, []);
+  const onAnswerIncorrect = useCallback((direction, number, answer) => {
+    const updatedArr = correctWordArray.filter((id) => {
+      return id !== number;
+    });
+    setCorrectWordArray(updatedArr);
+    console.log(`onIncorrect: "${direction}", "${number}", "${answer}"`);
+  }, []);
+
+  const focus = useCallback((event) => {
+    crossword.current?.focus();
+  }, []);
+  const fillOneCell = useCallback((event) => {
+    crossword.current?.setGuess(0, 0, "T");
+  }, []);
+  const reset = useCallback((event) => {
+    crossword.current?.reset();
+  }, []);
+
+  const onCellChange = useCallback((row: number, col: number, char: string) => {
+    //TODO see if we can wipe correct array if cell changes
+    console.log(`onCellChange: "${row}", "${col}", "${char}"`);
+  }, []);
+
   const handleBeginSession = async () => {
     const startTime = Date.now();
     //TODO Add session start time ^ to database with the User Address
     console.log(startTime);
     setSessionStart(true);
   };
+  const handleCheckWord = async () => {
+    if (correctWordArray.includes(checkWordId)) {
+      alert("Correct!");
+    } else {
+      alert("Try Again!");
+    }
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -103,14 +142,31 @@ function CrosswordPuzzle() {
                   </Heading>
                 </Flex>
                 <Crossword
-                  onCrosswordCorrect={onCrosswordCorrectProvider}
+                  ref={crossword}
+                  onCrosswordCorrect={onCrosswordCorrect}
+                  onCorrect={onCorrect}
+                  onCellChange={onCellChange}
+                  onAnswerIncorrect={onAnswerIncorrect}
                   data={crosswordData!}
                 />
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>
                 <VStack>
-                  <Button> Check word</Button>
-                  <Button> Check Puzzle</Button>
+                  <FormControl w="50%">
+                    <NumberInput
+                      max={520}
+                      min={0}
+                      onChange={(valueString) => setCheckWordId(valueString)}
+                    >
+                      <NumberInputField id="amount" placeholder="1" />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  </FormControl>
+
+                  <Button onClick={handleCheckWord}>Check Word</Button>
                   <Heading
                     fontSize={{
                       base: 10, // 0-48em
@@ -124,8 +180,9 @@ function CrosswordPuzzle() {
                     Get Help
                   </Heading>
                   <Button> Get a Hint</Button>
-                  <Button> Reveal Square</Button>
+                  <Button onClick={fillOneCell}> Reveal Square</Button>
                   <Button> Reveal Word</Button>
+                  <Button onClick={reset}>Reset</Button>
                 </VStack>
               </Box>
             </HStack>
