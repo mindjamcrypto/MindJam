@@ -72,7 +72,7 @@ function CrosswordPuzzle() {
       col: 0,
     };
     [...revWord.word].forEach((letter, i) => {
-      if (revWord.direction === "accross") {
+      if (revWord.direction === "across") {
         crossword.current?.setGuess(revWord.row, revWord.col + i, letter);
       } else {
         crossword.current?.setGuess(revWord.row + i, revWord.col, letter);
