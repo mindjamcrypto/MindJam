@@ -19,11 +19,19 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
+  // Grab the contract factory for NFT
+  const MindJamNFT = await ethers.getContractFactory("MindJamNFT");
+
+  // Start NFT deployment, returning a promise that resolves to a contract object
+  const mjNFT = await MindJamNFT.deploy(); // Instance of the contract
+  console.log("MindJamNFT Contract deployed to address:", mjNFT.address);
+
+  // Grab the contract factory for Token
   const Token = await ethers.getContractFactory("Token");
+  // Start Token deployment, returning a promise that resolves to a contract object
   const token = await Token.deploy();
   await token.deployed();
-
-  console.log("Token address:", token.address);
+  console.log("MindJam Token Contract deployed to address:", token.address);
 
   // We also save the contract's artifacts and address in the frontend directory
   saveFrontendFiles(token);
