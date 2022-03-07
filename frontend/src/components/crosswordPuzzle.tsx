@@ -63,6 +63,22 @@ function CrosswordPuzzle() {
   const fillOneCell = useCallback((event) => {
     crossword.current?.setGuess(0, 0, "T");
   }, []);
+  const fillMultipleCells = useCallback((event) => {
+    //All hardcoded, Should come from database
+    let revWord = {
+      word: "Three",
+      direction: "across",
+      row: 0,
+      col: 0,
+    };
+    [...revWord.word].forEach((letter, i) => {
+      if (revWord.direction === "accross") {
+        crossword.current?.setGuess(revWord.row, revWord.col + i, letter);
+      } else {
+        crossword.current?.setGuess(revWord.row + i, revWord.col, letter);
+      }
+    });
+  }, []);
   const reset = useCallback((event) => {
     crossword.current?.reset();
   }, []);
@@ -177,7 +193,7 @@ function CrosswordPuzzle() {
                   </Heading>
                   <Button> Get a Hint</Button>
                   <Button onClick={fillOneCell}> Reveal Square</Button>
-                  <Button> Reveal Word</Button>
+                  <Button onClick={fillMultipleCells}> Reveal Word</Button>
                   <Button onClick={reset}>Reset</Button>
                 </VStack>
               </Box>
