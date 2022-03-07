@@ -5,3 +5,4 @@ const web3 = createAlchemyWeb3(API_URL);
 
 const contract = require("../artifacts/contracts/MindJamNFT.sol/MindJamNFT.json");
 //console.log(JSON.stringify(contract.abi));
+//Work in progress...
