@@ -1,4 +1,12 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import Crossword, {
+  CrosswordImperative,
+  CrosswordGrid,
+  CrosswordProvider,
+  CrosswordProviderImperative,
+  DirectionClues,
+  AnswerTuple,
+} from "@jaredreisinger/react-crossword";
 import {
   Box,
   Flex,
@@ -9,8 +17,6 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import Crossword from "@jaredreisinger/react-crossword";
 import { crosswordList } from "../constants/dummyData/crosswordList";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
@@ -28,11 +34,21 @@ type CluesInputWithTitle = {
 function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
   const [loading, setLoading] = useState(true);
-  const [sessionStart, setSessionStart] = useState(false);
+  const [sessionStart, setSessionStart] = useState(true);
   const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
+  const [isCorrect, setIsCorrectValue] = useState(false);
 
+  const onCrosswordCorrectProvider = useCallback((isCorrect: boolean) => {
+    // console.log(isCorrect);
+    const endTime = Date.now();
+    //TODO Add session end time ^ to database with the User Address
+    console.log(endTime);
+    setIsCorrectValue(isCorrect);
+  }, []);
   const handleBeginSession = async () => {
-    //TODO make a call to the smart contract to start the session
+    const startTime = Date.now();
+    //TODO Add session start time ^ to database with the User Address
+    console.log(startTime);
     setSessionStart(true);
   };
   useEffect(() => {
@@ -62,6 +78,15 @@ function CrosswordPuzzle() {
     if (crosswordData) {
       return (
         <>
+          {isCorrect ? (
+            <Flex justifyContent="center" alignItems="center" pt={"10px"}>
+              <Button w="50%" colorScheme="green">
+                Submit!
+              </Button>
+            </Flex>
+          ) : (
+            ""
+          )}
           <Flex justifyContent="center" alignItems="center" pt={"20px"}>
             <HStack>
               <Box boxSize={"sm"}>
@@ -77,7 +102,10 @@ function CrosswordPuzzle() {
                     {crosswordData.title}
                   </Heading>
                 </Flex>
-                <Crossword data={crosswordData!} />
+                <Crossword
+                  onCrosswordCorrect={onCrosswordCorrectProvider}
+                  data={crosswordData!}
+                />
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>
                 <VStack>

@@ -3,24 +3,24 @@ export const crosswordList = [
     title: "Puzzle 1",
     across: {
       1: {
-        clue: "one plus one",
-        answer: "TWO",
+        clue: "five minus two",
+        answer: "THREE",
         row: 0,
         col: 0,
       },
     },
     down: {
       2: {
-        clue: "three minus two",
-        answer: "ONE",
+        clue: "not odd",
+        answer: "EVEN",
         row: 0,
-        col: 2,
+        col: 4,
       },
       3: {
-        clue: "three minus two",
-        answer: "ONE",
-        row: 2,
-        col: 3,
+        clue: "base-8",
+        answer: "HEX",
+        row: 0,
+        col: 1,
       },
     },
   },
