@@ -12,7 +12,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract Crosswords is ReentrancyGuard {
     address public owner;
     MindJam public mjToken;
-    SessionHandler sessionHandler;
 
     struct Crossword {
         uint256 squarePrice;
@@ -22,20 +21,13 @@ contract Crosswords is ReentrancyGuard {
         bool winnerPaid;
         uint256 timestamp; // time at which the game was created
         uint256 id;
-        uint256 recordTime; // The best time to finish the game, in seconds
+        uint256 recordTime; // The best time in which the game was finished
+        uint256 timesPlayed; // Number of times this game was played
     }
     Crossword[] crosswords;
 
     modifier onlyOwner() {
         require(msg.sender == owner, "You're not the owner");
-        _;
-    }
-
-    modifier onlySessionHandler() {
-        require(
-            msg.sender == address(sessionHandler),
-            "Only the session handler can call this function!"
-        );
         _;
     }
 
@@ -45,7 +37,6 @@ contract Crosswords is ReentrancyGuard {
     constructor(address _tokenAddress, address _sessionHandlerAddress) {
         owner = msg.sender;
         mjToken = MindJam(_tokenAddress);
-        sessionHandler = SessionHandler(_sessionHandlerAddress);
     }
 
     /**
@@ -59,7 +50,7 @@ contract Crosswords is ReentrancyGuard {
         uint256 _squarePrice,
         uint256 _wordPrice,
         uint256 _challengePrize
-    ) public returns (uint256) {
+    ) external returns (uint256) {
         crosswords.push(
             Crossword(
                 _squarePrice,
@@ -69,7 +60,8 @@ contract Crosswords is ReentrancyGuard {
                 false, // winner has not been payed yet
                 block.timestamp, // time of creation of the crossword
                 crosswords.length, // crossword id
-                0 // record time initialized to 0
+                0, // record time initialized to 0
+                0 // Numer of times played initliazed to 0
             )
         );
         return crosswords.length - 1;
@@ -79,7 +71,7 @@ contract Crosswords is ReentrancyGuard {
      * Requests an hint
      * @param _id the id of the crossword for which the hint is requested
      */
-    function requestSquare(uint256 _id) public {
+    function requestSquare(uint256 _id) external {
         uint256 price = crosswords[_id].squarePrice;
 
         // Check for allowance
@@ -96,7 +88,7 @@ contract Crosswords is ReentrancyGuard {
     }
 
     // Request a word reveal
-    function requestWord(uint256 _id) public {
+    function requestWord(uint256 _id) external {
         uint256 price = crosswords[_id].wordPrice;
 
         // Check for allowance
@@ -126,20 +118,27 @@ contract Crosswords is ReentrancyGuard {
      * @param _id The identifier of the crossword
      * @param _time The time it took the player
      * @param _player The player of the session
+     * @return true if player has put a new record time and the challenge is still on
      */
-    function newTime(
+    function sessionEnded(
         uint256 _id,
         uint256 _time,
         address _player
-    ) public onlySessionHandler returns (bool) {
-        Crossword memory crossword = crosswords[_id]; // gas saver
-        require(isChallengeOn(_id), "The challenge for this game is over!");
+    ) external onlyOwner returns (bool) {
+        require(_time > 0, "Time can't be 0!");
 
+        Crossword memory crossword = crosswords[_id]; // gas saver
+        crosswords[_id].timesPlayed++;
+        if (!isChallengeOn(_id)) return false;
+
+        // If it's the first time this game is played, or we have a new record
+        // Record the new time and set the player as winner
         if (crossword.recordTime == 0 || _time < crossword.recordTime) {
             crosswords[_id].recordTime = _time;
             crosswords[_id].winner = _player;
             return true;
-        } else return false;
+        }
+        return false;
     }
 
     /**@dev If the challenge is over, it returns the address of the winner
@@ -153,7 +152,7 @@ contract Crosswords is ReentrancyGuard {
     @dev This function is called from the player's account to claim the winner's prize
     @param _id The identifier of the crossword
      */
-    function payWinner(uint256 _id) public nonReentrant {
+    function payWinner(uint256 _id) external nonReentrant {
         Crossword memory crossword = crosswords[_id]; // gas saver
         require(
             msg.sender == crossword.winner,
@@ -168,7 +167,7 @@ contract Crosswords is ReentrancyGuard {
 
     /**@dev Withdraw all the mJTokens to specified address
      */
-    function withdraw(address _to) public onlyOwner {
+    function withdraw(address _to) external onlyOwner {
         uint256 balance = mjToken.balanceOf(address(this));
         require(balance > 0, "No tokens to transfer");
         mjToken.transfer(_to, balance);
