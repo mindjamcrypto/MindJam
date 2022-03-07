@@ -60,10 +60,6 @@ function CrosswordPuzzle() {
     setCorrectWordArray(updatedArr);
     console.log(`onIncorrect: "${direction}", "${number}", "${answer}"`);
   }, []);
-
-  const focus = useCallback((event) => {
-    crossword.current?.focus();
-  }, []);
   const fillOneCell = useCallback((event) => {
     crossword.current?.setGuess(0, 0, "T");
   }, []);
