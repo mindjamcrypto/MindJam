@@ -36,7 +36,7 @@ function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
   const crossword = useRef<CrosswordImperative>(null);
   const [loading, setLoading] = useState(true);
-  const [sessionStart, setSessionStart] = useState(true);
+  const [sessionStart, setSessionStart] = useState(false);
   const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
   const [isCorrect, setIsCorrectValue] = useState(false);
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
