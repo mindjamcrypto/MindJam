@@ -45,21 +45,28 @@ function CrosswordPuzzle() {
   const onCrosswordCorrect = useCallback((isCorrect: boolean) => {
     // console.log(isCorrect);
     const endTime = Date.now();
+    console.log(endTime);
     //TODO Add session end time ^ to database with the User Address
     setIsCorrectValue(isCorrect);
   }, []);
 
-  const onCorrect = useCallback((direction, number, answer) => {
-    setCorrectWordArray([...correctWordArray, number]);
-    console.log(`onCorrect: "${direction}", "${number}", "${answer}"`);
-  }, []);
-  const onAnswerIncorrect = useCallback((direction, number, answer) => {
-    const updatedArr = correctWordArray.filter((id) => {
-      return id !== number;
-    });
-    setCorrectWordArray(updatedArr);
-    console.log(`onIncorrect: "${direction}", "${number}", "${answer}"`);
-  }, []);
+  const onCorrect = useCallback(
+    (direction, number, answer) => {
+      setCorrectWordArray([...correctWordArray, number]);
+      console.log(`onCorrect: "${direction}", "${number}", "${answer}"`);
+    },
+    [correctWordArray]
+  );
+  const onAnswerIncorrect = useCallback(
+    (direction, number, answer) => {
+      const updatedArr = correctWordArray.filter((id) => {
+        return id !== number;
+      });
+      setCorrectWordArray(updatedArr);
+      console.log(`onIncorrect: "${direction}", "${number}", "${answer}"`);
+    },
+    [correctWordArray]
+  );
   const fillOneCell = useCallback((event) => {
     crossword.current?.setGuess(0, 0, "T");
   }, []);

@@ -13,7 +13,7 @@ import {
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link as ReactRouter } from "react-router-dom";
 import { Logo } from "./logo";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 declare var window: any;
 const Links = ["Games", "Create", "Team"];
 
