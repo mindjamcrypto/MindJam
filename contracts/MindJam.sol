@@ -14,8 +14,15 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MindJam is ERC20, Pausable, Ownable {
+    mapping(address => bool) whitelistedContracts;
+
     constructor() ERC20("MindJam", "MINDJAM") {
         _mint(msg.sender, 10000000 * 10**decimals());
+    }
+
+    modifier onlyWhitelist() {
+        require(whitelistedContracts[msg.sender]);
+        _;
     }
 
     //The Owner will be able to pause the functionality
@@ -46,9 +53,15 @@ contract MindJam is ERC20, Pausable, Ownable {
     function payWinner(address winner, uint256 amount)
         public
         payable
-        onlyOwner
+        onlyWhitelist
     {
         require(amount <= balanceOf(owner()), "Amount exceeds balance");
         transfer(winner, amount * 10**decimals()); //Emits a transfer event
+    }
+
+    /** @dev Add the address provided to the whitelist
+     */
+    function addToWhitelist(address _toWhitelist) external onlyOwner {
+        whitelistedContracts[_toWhitelist] = true;
     }
 }
