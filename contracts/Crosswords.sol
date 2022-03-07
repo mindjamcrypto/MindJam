@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "./MindJam.sol";
-import "./SessionHandler.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
@@ -22,7 +21,6 @@ contract Crosswords is ReentrancyGuard {
         uint256 timestamp; // time at which the game was created
         uint256 id;
         uint256 recordTime; // The best time in which the game was finished
-        uint256 timesPlayed; // Number of times this game was played
     }
     Crossword[] crosswords;
 
@@ -34,7 +32,7 @@ contract Crosswords is ReentrancyGuard {
     event RequestSquareReveal(address from, uint256 crosswordId);
     event RequestWordReveal(address from, uint256 crosswordId);
 
-    constructor(address _tokenAddress, address _sessionHandlerAddress) {
+    constructor(address _tokenAddress) {
         owner = msg.sender;
         mjToken = MindJam(_tokenAddress);
     }
@@ -60,8 +58,7 @@ contract Crosswords is ReentrancyGuard {
                 false, // winner has not been payed yet
                 block.timestamp, // time of creation of the crossword
                 crosswords.length, // crossword id
-                0, // record time initialized to 0
-                0 // Numer of times played initliazed to 0
+                0 // record time initialized to 0
             )
         );
         return crosswords.length - 1;
@@ -128,7 +125,6 @@ contract Crosswords is ReentrancyGuard {
         require(_time > 0, "Time can't be 0!");
 
         Crossword memory crossword = crosswords[_id]; // gas saver
-        crosswords[_id].timesPlayed++;
         if (!isChallengeOn(_id)) return false;
 
         // If it's the first time this game is played, or we have a new record

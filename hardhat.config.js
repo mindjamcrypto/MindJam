@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("dotenv").config()
 
 // The next line is part of the sample project, you don't need it in your
 // project. It imports a Hardhat task definition, that can be used for
@@ -20,6 +21,10 @@ module.exports = {
   networks: {
     hardhat: {
       chainId: 31337
+    },
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: [process.env.PRIVATE_KEY]
     }
   }
 };
