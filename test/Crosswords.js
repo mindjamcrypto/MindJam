@@ -8,6 +8,11 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 
+if (ethers.provider._network.name == "maticmum") {
+    console.log("yes")
+    process.exit(0)
+}
+
 describe("Crosswords contract", function () {
 
     let Token, token
@@ -15,22 +20,20 @@ describe("Crosswords contract", function () {
     let owner;
 
     beforeEach(async function () {
-        // deploy the token contract
+
+        // Deploy the token contract
         Token = await ethers.getContractFactory("MindJam")
         token = await Token.deploy()
         await token.deployed()
+        console.log("Deployed token contract at ", token.address)
 
-        // Get the ContractFactory and Signers here.
+        // Deploy the crosswords contract
         Crosswords = await ethers.getContractFactory("Crosswords");
-        [owner, s1, s2] = await ethers.getSigners();
-
-        // To deploy our contract, we just have to call Token.deploy() and await
-        // for it to be deployed(), which happens onces its transaction has been
-        // mined.
         crosswords = await Crosswords.deploy(token.address);
-
-        // We can interact with the contract by calling `hardhatToken.method()`
         await crosswords.deployed();
+        console.log("Deployed crosswords contract at ", crosswords.address)
+
+        [owner, s1, s2] = await ethers.getSigners();
         crosswords = crosswords.connect(owner)
         crosswordsS1 = crosswords.connect(s1)
         tokenS1 = token.connect(s1)
@@ -77,20 +80,36 @@ describe("Crosswords contract", function () {
             await token.mint(s1.address, bigN)
         })
 
-        it("Should not allow if no token allowance", async () => {
+        it("Should revert if no token allowance", async () => {
             await expect(crosswordsS1.requestWord(0)).to.be.reverted
         })
 
-        it("Should not allow if not enough tokens allowed", async () => {
+        it("Should revert if not enough tokens allowed", async () => {
 
             // Allow for less than enough
-            let notEnough = BigNumber.from(5).mul(BigNumber.from(10).pow(18))
+            let notEnough = BigNumber.from(10).pow(18).mul(5) // 5e18
             await tokenS1.approve(crosswords.address, notEnough)
             expect(await token.allowance(s1.address, crosswords.address)).to.equal(notEnough)
 
             // Check if tx gets reverted
             await expect(crosswordsS1.requestSquare(0)).to.be.reverted
             await expect(crosswordsS1.requestWord(0)).to.be.reverted
+
+        })
+
+        it("Should emit event if the payment is made", async () => {
+            // Allow spending for enough tokens
+            let enough = BigNumber.from(10).pow(18).mul(30) // 30e18
+            await tokenS1.approve(crosswords.address, enough)
+            expect(await token.allowance(s1.address, crosswords.address)).to.be.equal(enough)
+
+            // Send the request hint transactions
+            expect(crosswordsS1.requestSquare(0))
+                .to.emit(crosswords, "RequestSquare")
+                .withArgs(s1.address, 0)
+            expect(crosswordsS1.requestWord(0))
+                .to.emit(crosswords, "RequestWord")
+                .withArgs(s1.address, 0)
 
         })
     })

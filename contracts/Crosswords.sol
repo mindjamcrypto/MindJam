@@ -29,8 +29,8 @@ contract Crosswords is ReentrancyGuard {
         _;
     }
 
-    event RequestSquareReveal(address from, uint256 crosswordId);
-    event RequestWordReveal(address from, uint256 crosswordId);
+    event RequestSquare(address from, uint256 crosswordId);
+    event RequestWord(address from, uint256 crosswordId);
 
     constructor(address _tokenAddress) {
         owner = msg.sender;
@@ -79,7 +79,7 @@ contract Crosswords is ReentrancyGuard {
         bool sent = mjToken.transferFrom(msg.sender, address(this), price);
         require(sent, "Payment failed!");
 
-        emit RequestSquareReveal(msg.sender, _id);
+        emit RequestSquare(msg.sender, _id);
     }
 
     // Request a word reveal
@@ -96,7 +96,7 @@ contract Crosswords is ReentrancyGuard {
         bool sent = mjToken.transferFrom(msg.sender, address(this), price);
         require(sent, "Payment failed!");
 
-        emit RequestWordReveal(msg.sender, _id);
+        emit RequestWord(msg.sender, _id);
     }
 
     /**
@@ -115,11 +115,12 @@ contract Crosswords is ReentrancyGuard {
      * @param _player The player of the session
      * @return true if player has put a new record time and the challenge is still on
      */
+    // HACK CONCERN: anyone can call this function!
     function sessionEnded(
         uint256 _id,
         uint256 _time,
         address _player
-    ) external onlyOwner returns (bool) {
+    ) external returns (bool) {
         require(_time > 0, "Time can't be 0!");
 
         Crossword memory crossword = crosswords[_id]; // gas saver
