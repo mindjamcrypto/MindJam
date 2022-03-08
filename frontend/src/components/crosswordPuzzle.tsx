@@ -26,7 +26,7 @@ import { Loading } from "../components/loading";
 type CrosswordParams = {
   id: string;
 };
-interface Hint {
+interface RevealSquares {
   row: number;
   col: number;
   letter: string;
@@ -39,7 +39,7 @@ interface revealWord {
 }
 type mongoFormat = {
   _id: string;
-  hints: Array<Hint>;
+  revealSquares: Array<RevealSquares>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
   title: string;
@@ -84,7 +84,7 @@ function CrosswordPuzzle() {
   const fillOneCell = useCallback(
     (event) => {
       console.log(crosswordData);
-      const hint = crosswordData?.hints[0]; //TODO should the hints be random? how many hints?
+      const hint = crosswordData?.revealSquares[0]; //TODO should the hints be random? how many hints?
       crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
     },
     [crosswordData]
@@ -216,7 +216,6 @@ function CrosswordPuzzle() {
                   >
                     Get Help
                   </Heading>
-                  <Button> Get a Hint</Button>
                   <Button onClick={fillOneCell}> Reveal Square</Button>
                   <Button onClick={fillMultipleCells}> Reveal Word</Button>
                   <Button onClick={reset}>Reset</Button>
