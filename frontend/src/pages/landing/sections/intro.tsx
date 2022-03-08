@@ -5,7 +5,7 @@ export const Intro = () => {
   return (
     <Box
       w="full"
-      bg="blue.900"
+      bg="#0f3775"
       px={{
         base: "50px",
         md: "100px",
@@ -44,8 +44,8 @@ export const Intro = () => {
           px={2}
           py={1}
           rounded={"md"}
-          bg={"purple.400"}
-          color={"whiteAlpha.900"}
+          bg={"#94fc64"}
+          color={"blackAlpha.900"}
           fontSize={"30px"}
           _hover={{
             textDecoration: "none",

@@ -5,9 +5,7 @@ import {
   HStack,
   Link,
   IconButton,
-  Button,
   useDisclosure,
-  useColorModeValue,
   Stack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
@@ -22,10 +20,10 @@ const NavLink = ({ children }: { children: ReactNode }) => (
     px={2}
     py={1}
     rounded={"md"}
-    color={"whiteAlpha.900"}
+    color={"#a7fc5a"}
     _hover={{
       textDecoration: "none",
-      bg: "whiteAlpha.900",
+      bg: "blackAlpha.400",
     }}
     to={`/${children}`}
     as={ReactRouter}
@@ -35,27 +33,11 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 );
 
 export const Header = () => {
-  const [account, setAccountState] = useState("");
-  const connectUsersMeta = async () => {
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
-    return accounts[0];
-  };
-  let handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    let account0 = await connectUsersMeta();
-    setAccountState(account0);
-  };
-
-  window.ethereum.on("accountsChanged", function (accounts: Array<string>) {
-    setAccountState(accounts[0]);
-  });
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
-      <Box bg={useColorModeValue("blue.900", "blue.900")} px={4}>
+      <Box bg={"#0f3775"} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
             size={"md"}
@@ -76,16 +58,6 @@ export const Header = () => {
               ))}
             </HStack>
           </HStack>
-          <Flex alignItems={"center"}>
-            {!account ? (
-              <Button onClick={handleSubmit}>Connect Wallet</Button>
-            ) : (
-              <Button fontSize={15} letterSpacing="1.5px">
-                Connected: {account.substring(2, 6)} ...
-                {account.substring(37, 41)}
-              </Button>
-            )}
-          </Flex>
         </Flex>
         {isOpen ? (
           <Box pb={4} display={{ md: "none" }}>
