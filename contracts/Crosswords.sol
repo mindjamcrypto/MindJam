@@ -116,7 +116,7 @@ contract Crosswords is ReentrancyGuard {
      * @return true if player has put a new record time and the challenge is still on
      */
     // HACK CONCERN: anyone can call this function!
-    function sessionEnded(
+    function endSession(
         uint256 _id,
         uint256 _time,
         address _player
@@ -136,7 +136,7 @@ contract Crosswords is ReentrancyGuard {
         return false;
     }
 
-    /**@dev If the challenge is over, it returns the address of the winner
+    /**@dev Returns the address of the winner
      * @param _id the id of the crossword you want the winner of
      */
     function getWinner(uint256 _id) public view returns (address) {
@@ -157,7 +157,8 @@ contract Crosswords is ReentrancyGuard {
         require(!crossword.winnerPaid, "The winner has already been paid!");
 
         crosswords[_id].winnerPaid = true;
-        mjToken.payWinner(msg.sender, crossword.challengePrize);
+        bool sent = mjToken.transfer(msg.sender, crossword.challengePrize);
+        require(sent, "Transaction rejected");
     }
 
     /**@dev Withdraw all the mJTokens to specified address
@@ -166,5 +167,13 @@ contract Crosswords is ReentrancyGuard {
         uint256 balance = mjToken.balanceOf(address(this));
         require(balance > 0, "No tokens to transfer");
         mjToken.transfer(_to, balance);
+    }
+
+    /** Given a crossword ID, it tells whether the winner has already been payed
+     * @param _id ID of the crossword game
+     * @return bool
+     */
+    function hasWinnerBeenPaid(uint256 _id) external view returns (bool) {
+        return crosswords[_id].winnerPaid;
     }
 }
