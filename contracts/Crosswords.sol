@@ -42,12 +42,13 @@ contract Crosswords is ReentrancyGuard {
      * @param _squarePrice Number of tokens required to request an hint
      * @param _wordPrice Number of tokens required to reveal a word
      * @param _challengePrize Number of tokens to be minted to who wins the 24 hour challenge
+     * @return index The index of the newly created crossword
      */
     function newCrossword(
         uint256 _squarePrice,
         uint256 _wordPrice,
         uint256 _challengePrize
-    ) external {
+    ) external returns (uint256) {
         crosswords.push(
             Crossword(
                 _squarePrice,
@@ -60,6 +61,7 @@ contract Crosswords is ReentrancyGuard {
                 0 // record time initialized to 0
             )
         );
+        return crosswords.length - 1;
     }
 
     /**
