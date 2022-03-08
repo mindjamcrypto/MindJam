@@ -21,23 +21,28 @@ async function main() {
 
   // Grab the contract factory for NFT
   const MindJamNFT = await ethers.getContractFactory("MindJamNFT");
-
   // Start NFT deployment, returning a promise that resolves to a contract object
   const mjNFT = await MindJamNFT.deploy(); // Instance of the contract
   console.log("MindJamNFT Contract deployed to address:", mjNFT.address);
 
-  // Grab the contract factory for Token
-  const Token = await ethers.getContractFactory("Token");
+  // Grab the contract factory for MindJam Token
+  const MindJam = await ethers.getContractFactory("MindJam");
   // Start Token deployment, returning a promise that resolves to a contract object
-  const token = await Token.deploy();
-  await token.deployed();
-  console.log("MindJam Token Contract deployed to address:", token.address);
+  const mtoken = await MindJam.deploy();
+  await mtoken.deployed();
+  console.log("MindJam Token Contract deployed to address:", mtoken.address);
+
+  //Deploy Crossword smartcontract
+  const Crosswords = await ethers.getContractFactory("Crosswords");
+  const crosswords = await Crosswords.deploy(mtoken.address);
+  await crosswords.deployed();
+  console.log(`Crosswords Contract deployed at ${crosswords.address}`);
 
   // We also save the contract's artifacts and address in the frontend directory
-  saveFrontendFiles(token);
+  saveFrontendFiles(mtoken, crosswords, mjNFT);
 }
 
-function saveFrontendFiles(token) {
+function saveFrontendFiles(mtoken, crosswords, mjNFT) {
   const fs = require("fs");
   const contractsDir = __dirname + "/../frontend/src/contracts";
 
@@ -47,14 +52,27 @@ function saveFrontendFiles(token) {
 
   fs.writeFileSync(
     contractsDir + "/contract-address.json",
-    JSON.stringify({ Token: token.address }, undefined, 2)
+    JSON.stringify(
+      {
+        MindJam: mtoken.address,
+        Crosswords: crosswords.address,
+        MindJamNFT: mjNFT.address,
+      },
+      undefined,
+      2
+    )
   );
 
-  const TokenArtifact = artifacts.readArtifactSync("Token");
+  const MtokenArtifact = artifacts.readArtifactSync("MindJam");
+  const CrosswordsArtifact = artifacts.readArtifactSync("Crosswords");
 
   fs.writeFileSync(
-    contractsDir + "/Token.json",
-    JSON.stringify(TokenArtifact, null, 2)
+    contractsDir + "/MindJam.json",
+    JSON.stringify(MtokenArtifact, null, 2)
+  );
+  fs.writeFileSync(
+    contractsDir + "/Crosswords.json",
+    JSON.stringify(CrosswordsArtifact, null, 2)
   );
 }
 
