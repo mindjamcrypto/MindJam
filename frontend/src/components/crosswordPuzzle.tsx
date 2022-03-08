@@ -17,7 +17,7 @@ import {
   NumberInputStepper,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-
+import axios from "axios";
 import { crosswordList } from "../constants/dummyData/crosswordList";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
@@ -26,10 +26,24 @@ import { Loading } from "../components/loading";
 type CrosswordParams = {
   id: string;
 };
-type CluesInputWithTitle = {
-  title: string;
+interface Hint {
+  row: number;
+  col: number;
+  letter: string;
+}
+interface revealWord {
+  row: number;
+  col: number;
+  direction: string;
+  word: string;
+}
+type mongoFormat = {
+  _id: string;
+  hints: Array<Hint>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
+  title: string;
+  revealWords: Array<revealWord>;
 };
 
 function CrosswordPuzzle() {
@@ -37,7 +51,7 @@ function CrosswordPuzzle() {
   const crossword = useRef<CrosswordImperative>(null);
   const [loading, setLoading] = useState(true);
   const [sessionStart, setSessionStart] = useState(false);
-  const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
+  const [crosswordData, setCrosswordData] = useState<mongoFormat>();
   const [isCorrect, setIsCorrectValue] = useState(false);
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
   const [checkWordId, setCheckWordId] = useState("");
@@ -68,31 +82,21 @@ function CrosswordPuzzle() {
     [correctWordArray]
   );
   const fillOneCell = useCallback((event) => {
-    crossword.current?.setGuess(0, 0, "T");
+    const hint = crosswordData?.hints[0]; //TODO should the hints be random? how many hints?
+    crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
   }, []);
   const fillMultipleCells = useCallback((event) => {
-    //All hardcoded, Should come from database
-    let revWord = {
-      word: "Three",
-      direction: "across",
-      row: 0,
-      col: 0,
-    };
-    [...revWord.word].forEach((letter, i) => {
-      if (revWord.direction === "across") {
-        crossword.current?.setGuess(revWord.row, revWord.col + i, letter);
+    let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
+    [...revWord!.word].forEach((letter, i) => {
+      if (revWord!.direction === "across") {
+        crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
       } else {
-        crossword.current?.setGuess(revWord.row + i, revWord.col, letter);
+        crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
       }
     });
   }, []);
   const reset = useCallback((event) => {
     crossword.current?.reset();
-  }, []);
-
-  const onCellChange = useCallback((row: number, col: number, char: string) => {
-    //TODO see if we can wipe correct array if cell changes
-    console.log(`onCellChange: "${row}", "${col}", "${char}"`);
   }, []);
 
   const handleBeginSession = async () => {
@@ -112,8 +116,11 @@ function CrosswordPuzzle() {
   useEffect(() => {
     async function fetchData() {
       try {
-        //TODO make a call to the database instead of grabbing from test data
-        setCrosswordData(crosswordList[Number(id)]);
+        await axios
+          .get("http://localhost:3001/crosswords/" + id)
+          .then((result) => {
+            setCrosswordData(result.data);
+          });
         setLoading(false);
       } catch (e) {
         return <Error />;
@@ -164,9 +171,8 @@ function CrosswordPuzzle() {
                   ref={crossword}
                   onCrosswordCorrect={onCrosswordCorrect}
                   onCorrect={onCorrect}
-                  onCellChange={onCellChange}
                   onAnswerIncorrect={onAnswerIncorrect}
-                  data={crosswordData!}
+                  data={crosswordData}
                 />
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>

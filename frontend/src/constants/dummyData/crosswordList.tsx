@@ -1,6 +1,13 @@
 export const crosswordList = [
   {
     title: "Puzzle 1",
+    Hints: [
+      {
+        row: 0,
+        col: 0,
+        letter: "T",
+      },
+    ],
     across: {
       1: {
         clue: "five minus two",
@@ -17,7 +24,7 @@ export const crosswordList = [
         col: 4,
       },
       3: {
-        clue: "base-8",
+        clue: "base-16",
         answer: "HEX",
         row: 0,
         col: 1,
