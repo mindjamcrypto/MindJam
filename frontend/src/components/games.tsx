@@ -7,9 +7,35 @@ import {
   Link,
   Heading,
 } from "@chakra-ui/react";
-import { crosswordList } from "../constants/dummyData/crosswordList";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link as ReactRouter } from "react-router-dom";
+import axios from "axios";
+import { Error } from "../components/error";
+import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
+type mongoFormat = {
+  _id: string;
+  hints: Array<Object>;
+  across: Record<string, ClueTypeOriginal>;
+  down: Record<string, ClueTypeOriginal>;
+  title: string;
+};
+
 export const Games = () => {
+  const [crosswordData, setCrosswordData] = useState<Array<mongoFormat>>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        await axios.get("http://localhost:3001/crosswords").then((result) => {
+          //console.log(result.data);
+          setCrosswordData(result.data);
+        });
+      } catch (e) {
+        return <Error />;
+      }
+    }
+    fetchData();
+  }, []);
   return (
     <Box
       w="full"
@@ -36,10 +62,10 @@ export const Games = () => {
       </Flex>
       <Flex justifyContent="center" alignItems="center">
         <Grid templateColumns="repeat(4, 1fr)" gap={12}>
-          {crosswordList.map((puzzle, i) => (
+          {crosswordData?.map((puzzle) => (
             <GridItem>
               <Button>
-                <Link as={ReactRouter} to={`/crossword/${i}`}>
+                <Link as={ReactRouter} to={`/crossword/${puzzle._id}`}>
                   {puzzle.title}
                 </Link>
               </Button>

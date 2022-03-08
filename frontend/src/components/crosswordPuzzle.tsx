@@ -17,7 +17,7 @@ import {
   NumberInputStepper,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-
+import axios from "axios";
 import { crosswordList } from "../constants/dummyData/crosswordList";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
@@ -26,10 +26,12 @@ import { Loading } from "../components/loading";
 type CrosswordParams = {
   id: string;
 };
-type CluesInputWithTitle = {
-  title: string;
+type mongoFormat = {
+  _id: string;
+  hints: Array<Object>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
+  title: string;
 };
 
 function CrosswordPuzzle() {
@@ -37,7 +39,7 @@ function CrosswordPuzzle() {
   const crossword = useRef<CrosswordImperative>(null);
   const [loading, setLoading] = useState(true);
   const [sessionStart, setSessionStart] = useState(false);
-  const [crosswordData, setCrosswordData] = useState<CluesInputWithTitle>();
+  const [crosswordData, setCrosswordData] = useState<mongoFormat>();
   const [isCorrect, setIsCorrectValue] = useState(false);
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
   const [checkWordId, setCheckWordId] = useState("");
@@ -90,11 +92,6 @@ function CrosswordPuzzle() {
     crossword.current?.reset();
   }, []);
 
-  const onCellChange = useCallback((row: number, col: number, char: string) => {
-    //TODO see if we can wipe correct array if cell changes
-    console.log(`onCellChange: "${row}", "${col}", "${char}"`);
-  }, []);
-
   const handleBeginSession = async () => {
     const startTime = Date.now();
     //TODO Add session start time ^ to database with the User Address
@@ -112,8 +109,11 @@ function CrosswordPuzzle() {
   useEffect(() => {
     async function fetchData() {
       try {
-        //TODO make a call to the database instead of grabbing from test data
-        setCrosswordData(crosswordList[Number(id)]);
+        await axios
+          .get("http://localhost:3001/crosswords/" + id)
+          .then((result) => {
+            setCrosswordData(result.data);
+          });
         setLoading(false);
       } catch (e) {
         return <Error />;
@@ -164,9 +164,8 @@ function CrosswordPuzzle() {
                   ref={crossword}
                   onCrosswordCorrect={onCrosswordCorrect}
                   onCorrect={onCorrect}
-                  onCellChange={onCellChange}
                   onAnswerIncorrect={onAnswerIncorrect}
-                  data={crosswordData!}
+                  data={crosswordData}
                 />
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>
