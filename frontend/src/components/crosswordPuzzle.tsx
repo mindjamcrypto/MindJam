@@ -198,15 +198,6 @@ function CrosswordPuzzle() {
     if (crosswordData) {
       return (
         <>
-          {isCorrect ? (
-            <Flex justifyContent="center" alignItems="center" pt={"10px"}>
-              <Button w="50%" colorScheme="green">
-                Submit!
-              </Button>
-            </Flex>
-          ) : (
-            ""
-          )}
           <Flex justifyContent="center" alignItems="center" pt={"20px"}>
             <HStack>
               <Box boxSize={"sm"}>
@@ -266,6 +257,20 @@ function CrosswordPuzzle() {
               </Box>
             </HStack>
           </Flex>
+          {isCorrect ? (
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              pt={"10px"}
+              height="700px"
+            >
+              <Button w="50%" colorScheme="green">
+                Submit!
+              </Button>
+            </Flex>
+          ) : (
+            ""
+          )}
         </>
       );
     } else {
