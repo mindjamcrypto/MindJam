@@ -81,23 +81,35 @@ function CrosswordPuzzle() {
     },
     [correctWordArray]
   );
-  const fillOneCell = useCallback((event) => {
-    const hint = crosswordData?.hints[0]; //TODO should the hints be random? how many hints?
-    crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
-  }, []);
-  const fillMultipleCells = useCallback((event) => {
-    let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
-    [...revWord!.word].forEach((letter, i) => {
-      if (revWord!.direction === "across") {
-        crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
-      } else {
-        crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
-      }
-    });
-  }, []);
-  const reset = useCallback((event) => {
-    crossword.current?.reset();
-  }, []);
+  const fillOneCell = useCallback(
+    (event) => {
+      console.log(crosswordData);
+      const hint = crosswordData?.hints[0]; //TODO should the hints be random? how many hints?
+      crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
+    },
+    [crosswordData]
+  );
+
+  const fillMultipleCells = useCallback(
+    (event) => {
+      console.log(crosswordData?.revealWords);
+      let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
+      [...revWord!.word].forEach((letter, i) => {
+        if (revWord!.direction === "across") {
+          crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
+        } else {
+          crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
+        }
+      });
+    },
+    [crosswordData]
+  );
+  const reset = useCallback(
+    (event) => {
+      crossword.current?.reset();
+    },
+    [crosswordData]
+  );
 
   const handleBeginSession = async () => {
     const startTime = Date.now();
