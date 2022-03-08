@@ -12,7 +12,7 @@ import { Link as ReactRouter } from "react-router-dom";
 import axios from "axios";
 import { Error } from "../components/error";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
-interface Hint {
+interface RevealSquares {
   row: number;
   col: number;
   letter: string;
@@ -25,7 +25,7 @@ interface revealWord {
 }
 type mongoFormat = {
   _id: string;
-  hints: Array<Hint>;
+  revealSquares: Array<RevealSquares>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
   title: string;

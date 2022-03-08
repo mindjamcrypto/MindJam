@@ -26,7 +26,7 @@ import { Loading } from "../components/loading";
 type CrosswordParams = {
   id: string;
 };
-interface Hint {
+interface RevealSquares {
   row: number;
   col: number;
   letter: string;
@@ -39,7 +39,7 @@ interface revealWord {
 }
 type mongoFormat = {
   _id: string;
-  hints: Array<Hint>;
+  revealSquares: Array<RevealSquares>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
   title: string;
@@ -81,23 +81,35 @@ function CrosswordPuzzle() {
     },
     [correctWordArray]
   );
-  const fillOneCell = useCallback((event) => {
-    const hint = crosswordData?.hints[0]; //TODO should the hints be random? how many hints?
-    crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
-  }, []);
-  const fillMultipleCells = useCallback((event) => {
-    let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
-    [...revWord!.word].forEach((letter, i) => {
-      if (revWord!.direction === "across") {
-        crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
-      } else {
-        crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
-      }
-    });
-  }, []);
-  const reset = useCallback((event) => {
-    crossword.current?.reset();
-  }, []);
+  const fillOneCell = useCallback(
+    (event) => {
+      console.log(crosswordData);
+      const hint = crosswordData?.revealSquares[0]; //TODO should the hints be random? how many hints?
+      crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
+    },
+    [crosswordData]
+  );
+
+  const fillMultipleCells = useCallback(
+    (event) => {
+      console.log(crosswordData?.revealWords);
+      let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
+      [...revWord!.word].forEach((letter, i) => {
+        if (revWord!.direction === "across") {
+          crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
+        } else {
+          crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
+        }
+      });
+    },
+    [crosswordData]
+  );
+  const reset = useCallback(
+    (event) => {
+      crossword.current?.reset();
+    },
+    [crosswordData]
+  );
 
   const handleBeginSession = async () => {
     const startTime = Date.now();
@@ -204,7 +216,6 @@ function CrosswordPuzzle() {
                   >
                     Get Help
                   </Heading>
-                  <Button> Get a Hint</Button>
                   <Button onClick={fillOneCell}> Reveal Square</Button>
                   <Button onClick={fillMultipleCells}> Reveal Word</Button>
                   <Button onClick={reset}>Reset</Button>
