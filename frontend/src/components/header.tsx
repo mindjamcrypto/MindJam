@@ -22,10 +22,10 @@ const NavLink = ({ children }: { children: ReactNode }) => (
     px={2}
     py={1}
     rounded={"md"}
-    color={"whiteAlpha.900"}
+    color={"#a7fc5a"}
     _hover={{
       textDecoration: "none",
-      bg: "whiteAlpha.900",
+      bg: "blackAlpha.400",
     }}
     to={`/${children}`}
     as={ReactRouter}
@@ -55,7 +55,7 @@ export const Header = () => {
 
   return (
     <>
-      <Box bg={useColorModeValue("blue.900", "blue.900")} px={4}>
+      <Box bg={"#0f3775"} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
             size={"md"}
