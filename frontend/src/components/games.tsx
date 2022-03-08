@@ -37,7 +37,7 @@ export const Games = () => {
       <Flex justifyContent="center" alignItems="center">
         <Grid templateColumns="repeat(2, 1fr)" gap={12}>
           {gameList?.map((game) => (
-            <GridItem>
+            <GridItem key={game}>
               <Button>
                 <Link as={ReactRouter} to={`/${game}selection`}>
                   {game}

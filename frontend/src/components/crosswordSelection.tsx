@@ -12,6 +12,7 @@ import { Link as ReactRouter } from "react-router-dom";
 import axios from "axios";
 import { Error } from "../components/error";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
+import { Loading } from "../components/loading";
 interface RevealSquares {
   row: number;
   col: number;
@@ -34,13 +35,14 @@ type mongoFormat = {
 
 export const CrosswordSelection = () => {
   const [crosswordData, setCrosswordData] = useState<Array<mongoFormat>>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function fetchData() {
       try {
         await axios.get("http://localhost:3001/crosswords").then((result) => {
           //console.log(result.data);
           setCrosswordData(result.data);
+          setLoading(false);
         });
       } catch (e) {
         return <Error />;
@@ -48,43 +50,48 @@ export const CrosswordSelection = () => {
     }
     fetchData();
   }, []);
-  return (
-    <Box
-      w="full"
-      bg="whiteAlpha.900"
-      px={{
-        base: "50px", // 0-48em
-        md: "100px", // 48em-80em,
-        xl: "200px", // 80em+
-      }}
-      py="60px"
-    >
-      <Flex justifyContent="center" alignItems="center">
-        <Heading
-          fontSize={{
-            base: 20, // 0-48em
-            md: 44, // 48em-80em,
-            xl: 54, // 80em+
-          }}
-          letterSpacing="6px"
-          pb="15px"
-        >
-          Choose a crossword puzzle!
-        </Heading>
-      </Flex>
-      <Flex justifyContent="center" alignItems="center">
-        <Grid templateColumns="repeat(4, 1fr)" gap={12}>
-          {crosswordData?.map((puzzle) => (
-            <GridItem>
-              <Button>
-                <Link as={ReactRouter} to={`/crossword/${puzzle._id}`}>
-                  {puzzle.title}
-                </Link>
-              </Button>
-            </GridItem>
-          ))}
-        </Grid>
-      </Flex>
-    </Box>
-  );
+
+  if (loading) {
+    return <Loading />;
+  } else {
+    return (
+      <Box
+        w="full"
+        bg="whiteAlpha.900"
+        px={{
+          base: "50px", // 0-48em
+          md: "100px", // 48em-80em,
+          xl: "200px", // 80em+
+        }}
+        py="60px"
+      >
+        <Flex justifyContent="center" alignItems="center">
+          <Heading
+            fontSize={{
+              base: 20, // 0-48em
+              md: 44, // 48em-80em,
+              xl: 54, // 80em+
+            }}
+            letterSpacing="6px"
+            pb="15px"
+          >
+            Choose a crossword puzzle!
+          </Heading>
+        </Flex>
+        <Flex justifyContent="center" alignItems="center">
+          <Grid templateColumns="repeat(4, 1fr)" gap={12}>
+            {crosswordData?.map((puzzle) => (
+              <GridItem key={puzzle._id}>
+                <Button>
+                  <Link as={ReactRouter} to={`/crossword/${puzzle._id}`}>
+                    {puzzle.title}
+                  </Link>
+                </Button>
+              </GridItem>
+            ))}
+          </Grid>
+        </Flex>
+      </Box>
+    );
+  }
 };
