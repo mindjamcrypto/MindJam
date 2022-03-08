@@ -12,12 +12,24 @@ import { Link as ReactRouter } from "react-router-dom";
 import axios from "axios";
 import { Error } from "../components/error";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
+interface Hint {
+  row: number;
+  col: number;
+  letter: string;
+}
+interface revealWord {
+  row: number;
+  col: number;
+  direction: string;
+  word: string;
+}
 type mongoFormat = {
   _id: string;
-  hints: Array<Object>;
+  hints: Array<Hint>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
   title: string;
+  revealWords: Array<revealWord>;
 };
 
 export const Games = () => {

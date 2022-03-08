@@ -26,12 +26,24 @@ import { Loading } from "../components/loading";
 type CrosswordParams = {
   id: string;
 };
+interface Hint {
+  row: number;
+  col: number;
+  letter: string;
+}
+interface revealWord {
+  row: number;
+  col: number;
+  direction: string;
+  word: string;
+}
 type mongoFormat = {
   _id: string;
-  hints: Array<Object>;
+  hints: Array<Hint>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
   title: string;
+  revealWords: Array<revealWord>;
 };
 
 function CrosswordPuzzle() {
@@ -70,21 +82,16 @@ function CrosswordPuzzle() {
     [correctWordArray]
   );
   const fillOneCell = useCallback((event) => {
-    crossword.current?.setGuess(0, 0, "T");
+    const hint = crosswordData?.hints[0]; //TODO should the hints be random? how many hints?
+    crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
   }, []);
   const fillMultipleCells = useCallback((event) => {
-    //All hardcoded, Should come from database
-    let revWord = {
-      word: "Three",
-      direction: "across",
-      row: 0,
-      col: 0,
-    };
-    [...revWord.word].forEach((letter, i) => {
-      if (revWord.direction === "across") {
-        crossword.current?.setGuess(revWord.row, revWord.col + i, letter);
+    let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
+    [...revWord!.word].forEach((letter, i) => {
+      if (revWord!.direction === "across") {
+        crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
       } else {
-        crossword.current?.setGuess(revWord.row + i, revWord.col, letter);
+        crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
       }
     });
   }, []);
