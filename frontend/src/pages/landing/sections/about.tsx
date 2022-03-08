@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Text, Flex, Heading, HStack } from "@chakra-ui/react";
-import placeholderImg from "../../../constants/images/image-holder-icon.png";
+import levelUp from "../../../constants/images/levelUp.png";
 export const About = () => {
   return (
     <Box
       w="full"
-      bg="whiteAlpha.900"
+      bg="#a7fc5a"
       px={{
         base: "50px", // 0-48em
         md: "100px", // 48em-80em,
@@ -22,14 +22,14 @@ export const About = () => {
               xl: 54, // 80em+
             }}
             letterSpacing="6px"
-            color="blue.900"
+            color="#0f3775"
           >
             A platform for mind games and mind-building content!
           </Heading>
         </Flex>
         <Flex justifyContent="center" alignItems="center" pb="30px">
           <Box boxSize="sm">
-            <img src={placeholderImg} alt="BigCo Inc. logo" />
+            <img src={levelUp} alt="BigCo Inc. logo" />
           </Box>
         </Flex>
       </HStack>

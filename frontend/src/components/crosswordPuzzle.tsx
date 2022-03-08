@@ -15,6 +15,7 @@ import {
   NumberIncrementStepper,
   NumberInput,
   NumberInputStepper,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -22,7 +23,7 @@ import { crosswordList } from "../constants/dummyData/crosswordList";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
-
+declare var window: any;
 type CrosswordParams = {
   id: string;
 };
@@ -56,6 +57,26 @@ function CrosswordPuzzle() {
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
   const [checkWordId, setCheckWordId] = useState("");
 
+  //METAMASK CONNECT LOGIC
+  const [account, setAccountState] = useState("");
+  const connectUsersMeta = async () => {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    return accounts[0];
+  };
+  let handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    let account0 = await connectUsersMeta();
+    setAccountState(account0);
+  };
+
+  window.ethereum.on("accountsChanged", function (accounts: Array<string>) {
+    setAccountState(accounts[0]);
+  });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  //CROSSWORD LOGIC
   const onCrosswordCorrect = useCallback((isCorrect: boolean) => {
     // console.log(isCorrect);
     const endTime = Date.now();
@@ -146,11 +167,23 @@ function CrosswordPuzzle() {
       fetchData();
     }
   }, [id, sessionStart]);
-
-  if (!sessionStart) {
+  console.log(!account.length);
+  if (!account.length) {
     return (
       <Flex justifyContent="center" alignItems="center" height="800px">
-        <Button onClick={handleBeginSession}>Begin Session</Button>
+        <Button onClick={handleSubmit}>Connect Wallet</Button>
+      </Flex>
+    );
+  } else if (account && !sessionStart) {
+    return (
+      <Flex justifyContent="center" alignItems="center" height="800px">
+        <VStack>
+          <Button fontSize={15} letterSpacing="1.5px">
+            Connected: {account.substring(2, 6)} ...
+            {account.substring(37, 41)}
+          </Button>
+          <Button onClick={handleBeginSession}>Begin Session</Button>{" "}
+        </VStack>
       </Flex>
     );
   } else if (loading) {

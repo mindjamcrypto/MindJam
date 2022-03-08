@@ -22,15 +22,15 @@ contract Crosswords is ReentrancyGuard {
         uint256 id;
         uint256 recordTime; // The best time in which the game was finished
     }
-    Crossword[] crosswords;
+    Crossword[] public crosswords;
 
     modifier onlyOwner() {
         require(msg.sender == owner, "You're not the owner");
         _;
     }
 
-    event RequestSquareReveal(address from, uint256 crosswordId);
-    event RequestWordReveal(address from, uint256 crosswordId);
+    event RequestSquare(address from, uint256 crosswordId);
+    event RequestWord(address from, uint256 crosswordId);
 
     constructor(address _tokenAddress) {
         owner = msg.sender;
@@ -42,7 +42,7 @@ contract Crosswords is ReentrancyGuard {
      * @param _squarePrice Number of tokens required to request an hint
      * @param _wordPrice Number of tokens required to reveal a word
      * @param _challengePrize Number of tokens to be minted to who wins the 24 hour challenge
-     * @return id of the crossword
+     * @return index The index of the newly created crossword
      */
     function newCrossword(
         uint256 _squarePrice,
@@ -81,7 +81,7 @@ contract Crosswords is ReentrancyGuard {
         bool sent = mjToken.transferFrom(msg.sender, address(this), price);
         require(sent, "Payment failed!");
 
-        emit RequestSquareReveal(msg.sender, _id);
+        emit RequestSquare(msg.sender, _id);
     }
 
     // Request a word reveal
@@ -98,7 +98,7 @@ contract Crosswords is ReentrancyGuard {
         bool sent = mjToken.transferFrom(msg.sender, address(this), price);
         require(sent, "Payment failed!");
 
-        emit RequestWordReveal(msg.sender, _id);
+        emit RequestWord(msg.sender, _id);
     }
 
     /**
@@ -117,11 +117,12 @@ contract Crosswords is ReentrancyGuard {
      * @param _player The player of the session
      * @return true if player has put a new record time and the challenge is still on
      */
-    function sessionEnded(
+    // HACK CONCERN: anyone can call this function!
+    function endSession(
         uint256 _id,
         uint256 _time,
         address _player
-    ) external onlyOwner returns (bool) {
+    ) external returns (bool) {
         require(_time > 0, "Time can't be 0!");
 
         Crossword memory crossword = crosswords[_id]; // gas saver
@@ -137,7 +138,7 @@ contract Crosswords is ReentrancyGuard {
         return false;
     }
 
-    /**@dev If the challenge is over, it returns the address of the winner
+    /**@dev Returns the address of the winner
      * @param _id the id of the crossword you want the winner of
      */
     function getWinner(uint256 _id) public view returns (address) {
@@ -158,7 +159,8 @@ contract Crosswords is ReentrancyGuard {
         require(!crossword.winnerPaid, "The winner has already been paid!");
 
         crosswords[_id].winnerPaid = true;
-        mjToken.payWinner(msg.sender, crossword.challengePrize);
+        bool sent = mjToken.transfer(msg.sender, crossword.challengePrize);
+        require(sent, "Transaction rejected");
     }
 
     /**@dev Withdraw all the mJTokens to specified address
@@ -167,5 +169,13 @@ contract Crosswords is ReentrancyGuard {
         uint256 balance = mjToken.balanceOf(address(this));
         require(balance > 0, "No tokens to transfer");
         mjToken.transfer(_to, balance);
+    }
+
+    /** Given a crossword ID, it tells whether the winner has already been payed
+     * @param _id ID of the crossword game
+     * @return bool
+     */
+    function hasWinnerBeenPaid(uint256 _id) external view returns (bool) {
+        return crosswords[_id].winnerPaid;
     }
 }
