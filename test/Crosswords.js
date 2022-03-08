@@ -1,14 +1,8 @@
-// This is an example test file. Hardhat will run every *.js file in `test/`,
-// so feel free to add new ones.
-
-// Hardhat tests are normally written with Mocha and Chai.
-
-// We import Chai to use its asserting functions here.
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 
-// utility function to not have to deal with decimals
+// Utility function to not have to deal with decimals
 function toEth(n) {
     return ethers.utils.parseEther(n.toString())
 }
