@@ -31,7 +31,7 @@ export const Games = () => {
           letterSpacing="6px"
           pb="15px"
         >
-          Choose a game !
+          Choose a game!
         </Heading>
       </Flex>
       <Flex justifyContent="center" alignItems="center">

@@ -26,6 +26,16 @@ interface revealWord {
 }
 type mongoFormat = {
   _id: string;
+  GameTypeId: number;
+  GameTitle: string;
+  PaidActionObject: Record<string, number>;
+  FastedCompletionTime: number;
+  isActive: boolean;
+  GameData: GameData;
+};
+
+type GameData = {
+  _id: string;
   revealSquares: Array<RevealSquares>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
@@ -84,7 +94,7 @@ export const CrosswordSelection = () => {
               <GridItem key={puzzle._id}>
                 <Button>
                   <Link as={ReactRouter} to={`/crossword/${puzzle._id}`}>
-                    {puzzle.title}
+                    {puzzle.GameData.title}
                   </Link>
                 </Button>
               </GridItem>

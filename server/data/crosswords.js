@@ -1,14 +1,14 @@
-const { crosswords } = require("../config/mongoCollections");
+const { Games } = require("../config/mongoCollections");
 
 async function getAllCrosswords() {
-  const crosswordsCollection = await crosswords();
-  const all = await crosswordsCollection.find({}).toArray();
+  const gamesCollection = await Games();
+  const all = await gamesCollection.find({ GameTypeID: 1 }).toArray();
   return all;
 }
 async function getCrosswordById(_id) {
-  const crosswordsCollection = await crosswords();
-  const all = await crosswordsCollection.findOne({ id: _id });
-  return all;
+  const gamesCollection = await Games();
+  const crossword = await gamesCollection.findOne({ id: _id });
+  return crossword;
 }
 
 module.exports = {

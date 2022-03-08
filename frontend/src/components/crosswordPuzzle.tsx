@@ -40,6 +40,16 @@ interface revealWord {
 }
 type mongoFormat = {
   _id: string;
+  GameTypeId: number;
+  GameTitle: string;
+  PaidActionObject: Record<string, number>;
+  FastedCompletionTime: number;
+  isActive: boolean;
+  GameData: GameData;
+};
+
+type GameData = {
+  _id: string;
   revealSquares: Array<RevealSquares>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
@@ -105,7 +115,7 @@ function CrosswordPuzzle() {
   const fillOneCell = useCallback(
     (event) => {
       console.log(crosswordData);
-      const hint = crosswordData?.revealSquares[0]; //TODO should the hints be random? how many hints?
+      const hint = crosswordData?.GameData.revealSquares[0]; //TODO should the hints be random? how many hints?
       crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
     },
     [crosswordData]
@@ -113,8 +123,8 @@ function CrosswordPuzzle() {
 
   const fillMultipleCells = useCallback(
     (event) => {
-      console.log(crosswordData?.revealWords);
-      let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
+      console.log(crosswordData?.GameData.revealWords);
+      let revWord = crosswordData?.GameData.revealWords[0]; //TODO should the hints be random? how many hints?
       [...revWord!.word].forEach((letter, i) => {
         if (revWord!.direction === "across") {
           crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
@@ -209,7 +219,7 @@ function CrosswordPuzzle() {
                     }}
                     letterSpacing="6px"
                   >
-                    {crosswordData.title}
+                    {crosswordData.GameData.title}
                   </Heading>
                 </Flex>
                 <Crossword
@@ -217,7 +227,7 @@ function CrosswordPuzzle() {
                   onCrosswordCorrect={onCrosswordCorrect}
                   onCorrect={onCorrect}
                   onAnswerIncorrect={onAnswerIncorrect}
-                  data={crosswordData}
+                  data={crosswordData.GameData}
                 />
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>
