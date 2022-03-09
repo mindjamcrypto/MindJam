@@ -40,6 +40,16 @@ interface revealWord {
 }
 type mongoFormat = {
   _id: string;
+  GameTypeId: number;
+  GameTitle: string;
+  PaidActionObject: Record<string, number>;
+  FastedCompletionTime: number;
+  isActive: boolean;
+  GameData: GameData;
+};
+
+type GameData = {
+  _id: string;
   revealSquares: Array<RevealSquares>;
   across: Record<string, ClueTypeOriginal>;
   down: Record<string, ClueTypeOriginal>;
@@ -74,16 +84,24 @@ function CrosswordPuzzle() {
   window.ethereum.on("accountsChanged", function (accounts: Array<string>) {
     setAccountState(accounts[0]);
   });
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   //CROSSWORD LOGIC
-  const onCrosswordCorrect = useCallback((isCorrect: boolean) => {
-    // console.log(isCorrect);
-    const endTime = Date.now();
-    console.log(endTime);
-    //TODO Add session end time ^ to database with the User Address
-    setIsCorrectValue(isCorrect);
-  }, []);
+  const onCrosswordCorrect = useCallback(
+    async (isCorrect: boolean) => {
+      // console.log(isCorrect);
+      const endTime = Date.now();
+      console.log("UPDATING SESSION WITH END TIME");
+      await axios.post("http://localhost:3001/session/end", {
+        params: {
+          endTime: endTime,
+          gameID: crosswordData!._id,
+          account: account,
+        },
+      });
+      setIsCorrectValue(isCorrect);
+    },
+    [crosswordData]
+  );
 
   const onCorrect = useCallback(
     (direction, number, answer) => {
@@ -104,8 +122,7 @@ function CrosswordPuzzle() {
   );
   const fillOneCell = useCallback(
     (event) => {
-      console.log(crosswordData);
-      const hint = crosswordData?.revealSquares[0]; //TODO should the hints be random? how many hints?
+      const hint = crosswordData?.GameData.revealSquares[0]; //TODO should the hints be random? how many hints?
       crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
     },
     [crosswordData]
@@ -113,8 +130,7 @@ function CrosswordPuzzle() {
 
   const fillMultipleCells = useCallback(
     (event) => {
-      console.log(crosswordData?.revealWords);
-      let revWord = crosswordData?.revealWords[0]; //TODO should the hints be random? how many hints?
+      let revWord = crosswordData?.GameData.revealWords[0]; //TODO should the hints be random? how many hints?
       [...revWord!.word].forEach((letter, i) => {
         if (revWord!.direction === "across") {
           crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
@@ -132,12 +148,38 @@ function CrosswordPuzzle() {
     [crosswordData]
   );
 
-  const handleBeginSession = async () => {
+  const handleBeginSession = useCallback(async () => {
     const startTime = Date.now();
-    //TODO Add session start time ^ to database with the User Address
-    console.log(startTime);
-    setSessionStart(true);
+    // if there is not a session in the database already
+    console.log(crosswordData?._id);
+    const hasSession = await axios.get("http://localhost:3001/session/check", {
+      params: {
+        gameID: crosswordData?._id,
+        account: account,
+      },
+    });
+    console.log(hasSession);
+    if (hasSession.data) {
+      //already started session so do not add another doc
+      console.log("ALREADY HAS SESSION in DB");
+      setSessionStart(true);
+    } else {
+      console.log("CREATING NEW SESSION");
+      await axios.post("http://localhost:3001/session/start", {
+        params: {
+          startTime: startTime,
+          gameID: crosswordData!._id,
+          account: account,
+        },
+      });
+      setSessionStart(true);
+    }
+  }, [crosswordData, account]);
+
+  const handleSubmitToSM = async () => {
+    console.log("Submit to smart contract here");
   };
+
   const handleCheckWord = async () => {
     if (correctWordArray.includes(checkWordId)) {
       alert("Correct!");
@@ -163,18 +205,18 @@ function CrosswordPuzzle() {
         return <Error />;
       }
     }
-    if (sessionStart) {
+    if (id) {
       fetchData();
     }
-  }, [id, sessionStart]);
-  console.log(!account.length);
+  }, [id]);
+
   if (!account.length) {
     return (
       <Flex justifyContent="center" alignItems="center" height="800px">
         <Button onClick={handleSubmit}>Connect Wallet</Button>
       </Flex>
     );
-  } else if (account && !sessionStart) {
+  } else if (account && !sessionStart && crosswordData) {
     return (
       <Flex justifyContent="center" alignItems="center" height="800px">
         <VStack>
@@ -192,15 +234,6 @@ function CrosswordPuzzle() {
     if (crosswordData) {
       return (
         <>
-          {isCorrect ? (
-            <Flex justifyContent="center" alignItems="center" pt={"10px"}>
-              <Button w="50%" colorScheme="green">
-                Submit!
-              </Button>
-            </Flex>
-          ) : (
-            ""
-          )}
           <Flex justifyContent="center" alignItems="center" pt={"20px"}>
             <HStack>
               <Box boxSize={"sm"}>
@@ -213,7 +246,7 @@ function CrosswordPuzzle() {
                     }}
                     letterSpacing="6px"
                   >
-                    {crosswordData.title}
+                    {crosswordData.GameData.title}
                   </Heading>
                 </Flex>
                 <Crossword
@@ -221,7 +254,7 @@ function CrosswordPuzzle() {
                   onCrosswordCorrect={onCrosswordCorrect}
                   onCorrect={onCorrect}
                   onAnswerIncorrect={onAnswerIncorrect}
-                  data={crosswordData}
+                  data={crosswordData.GameData}
                 />
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>
@@ -260,6 +293,20 @@ function CrosswordPuzzle() {
               </Box>
             </HStack>
           </Flex>
+          {isCorrect ? (
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              pt={"10px"}
+              height="700px"
+            >
+              <Button w="50%" colorScheme="green" onClick={handleSubmitToSM}>
+                Submit!
+              </Button>
+            </Flex>
+          ) : (
+            ""
+          )}
         </>
       );
     } else {
