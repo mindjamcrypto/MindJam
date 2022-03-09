@@ -90,15 +90,19 @@ function CrosswordPuzzle() {
     async (isCorrect: boolean) => {
       // console.log(isCorrect);
       const endTime = Date.now();
-      console.log("UPDATING SESSION WITH END TIME");
-      await axios.post("http://localhost:3001/session/end", {
-        params: {
-          endTime: endTime,
-          gameID: crosswordData!._id,
-          account: account,
-        },
-      });
-      setIsCorrectValue(isCorrect);
+      if (crosswordData) {
+        console.log("UPDATING SESSION WITH END TIME");
+        await axios.post("http://localhost:3001/session/end", {
+          params: {
+            endTime: endTime,
+            gameID: crosswordData._id,
+            account: account,
+          },
+        });
+        setIsCorrectValue(isCorrect);
+      } else {
+        console.log("crosswordDATA IS UNDEFINED??");
+      }
     },
     [crosswordData]
   );
