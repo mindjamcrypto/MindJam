@@ -69,6 +69,7 @@ contract Crosswords is ReentrancyGuard {
      * @param _id the id of the crossword for which the hint is requested
      */
     function requestSquare(uint256 _id) external {
+        require(_id < crosswords.length, "Index out of bound!");
         uint256 price = crosswords[_id].squarePrice;
 
         // Check for allowance
@@ -86,6 +87,7 @@ contract Crosswords is ReentrancyGuard {
 
     // Request a word reveal
     function requestWord(uint256 _id) external {
+        require(_id < crosswords.length, "Index out of bound!");
         uint256 price = crosswords[_id].wordPrice;
 
         // Check for allowance
@@ -124,6 +126,7 @@ contract Crosswords is ReentrancyGuard {
         address _player
     ) external returns (bool) {
         require(_time > 0, "Time can't be 0!");
+        require(_id < crosswords.length, "Index out of bound!");
 
         Crossword memory crossword = crosswords[_id]; // gas saver
         if (!isChallengeOn(_id)) return false;

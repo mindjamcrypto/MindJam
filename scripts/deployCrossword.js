@@ -1,12 +1,19 @@
 const hre = require("hardhat")
-require("dotenv").config()
-let tokenAddress = "0x65AD5cad49e9278b327aA2B09B7614733211996e"
+const ethers = hre.ethers
+
 
 async function main() {
-    const Crosswords = await hre.ethers.getContractFactory("Crosswords")
-    const crosswords = await Crosswords.deploy(tokenAddress)
+    // Deploy token
+    const Token = await ethers.getContractFactory("MindJam")
+    const token = await Token.deploy()
+    await token.deployed()
+    console.log("Token contract deployed at ", token.address)
+
+    // Deploy Crosswords
+    const Crosswords = await ethers.getContractFactory("Crosswords")
+    const crosswords = await Crosswords.deploy(token.address)
     await crosswords.deployed()
-    console.log(`Contract deployed at ${crosswords.address}`)
+    console.log("Crosswords contract deployed at ", crosswords.address)
 }
 
 
