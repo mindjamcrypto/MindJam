@@ -24,7 +24,7 @@ import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
 import { getSquareHint } from "../actions/CrosswordsActions";
-
+import { Header } from "./header";
 declare var window: any;
 type CrosswordParams = {
   id: string;
@@ -226,28 +226,41 @@ function CrosswordPuzzle() {
 
   if (!account.length) {
     return (
-      <Flex justifyContent="center" alignItems="center" height="800px">
-        <Button onClick={handleSubmit}>Connect Wallet</Button>
-      </Flex>
+      <Box>
+        <Box bg={"#09245e"}>
+          <Header />
+        </Box>
+        <Flex justifyContent="center" alignItems="center" height="800px">
+          <Button onClick={handleSubmit}>Connect Wallet</Button>
+        </Flex>
+      </Box>
     );
   } else if (account && !sessionStart && crosswordData) {
     return (
-      <Flex justifyContent="center" alignItems="center" height="800px">
-        <VStack>
-          <Button fontSize={15} letterSpacing="1.5px">
-            Connected: {account.substring(2, 6)} ...
-            {account.substring(37, 41)}
-          </Button>
-          <Button onClick={handleBeginSession}>Begin Session</Button>{" "}
-        </VStack>
-      </Flex>
+      <Box>
+        <Box bg={"#09245e"}>
+          <Header />
+        </Box>
+        <Flex justifyContent="center" alignItems="center" height="800px">
+          <VStack>
+            <Button fontSize={15} letterSpacing="1.5px">
+              Connected: {account.substring(2, 6)} ...
+              {account.substring(37, 41)}
+            </Button>
+            <Button onClick={handleBeginSession}>Begin Session</Button>{" "}
+          </VStack>
+        </Flex>
+      </Box>
     );
   } else if (loading) {
     return <Loading />;
   } else {
     if (crosswordData) {
       return (
-        <>
+        <Box>
+          <Box bg={"#09245e"}>
+            <Header />
+          </Box>
           <Flex justifyContent="center" alignItems="center" pt={"20px"}>
             <HStack>
               <Box boxSize={"sm"}>
@@ -321,10 +334,10 @@ function CrosswordPuzzle() {
           ) : (
             ""
           )}
-        </>
+        </Box>
       );
     } else {
-      return <div>error</div>;
+      return <Error />;
     }
   }
 }

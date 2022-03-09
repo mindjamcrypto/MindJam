@@ -12,7 +12,6 @@ import { CrosswordSelection } from "./components/crosswordSelection";
 export const App = () => (
   <ChakraProvider>
     <Router>
-      <Header />
       <Routes>
         <Route path="/" element={<Landing />}></Route>
         <Route path="/games" element={<Games />}></Route>

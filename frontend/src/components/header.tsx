@@ -37,26 +37,29 @@ export const Header = () => {
 
   return (
     <>
-      <Box bg={"#0f3775"} px={4}>
-        <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+      <Box px={4}>
+        <Flex h={16}>
+          <Logo />
           <IconButton
             size={"md"}
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
             aria-label={"Open Menu"}
             display={{ md: "none" }}
             onClick={isOpen ? onClose : onOpen}
+            marginLeft="auto"
+            mt={"10px"}
           />
-          <HStack spacing={8} alignItems={"center"}>
-            <Logo />
-            <HStack
-              as={"nav"}
-              spacing={4}
-              display={{ base: "none", md: "flex" }}
-            >
-              {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
-              ))}
-            </HStack>
+          <HStack
+            as={"nav"}
+            spacing={4}
+            display={{ base: "none", md: "flex" }}
+            marginLeft="240px"
+            alignItems={"center"}
+            justifyContent={"space-between"}
+          >
+            {Links.map((link) => (
+              <NavLink key={link}>{link}</NavLink>
+            ))}
           </HStack>
         </Flex>
         {isOpen ? (
