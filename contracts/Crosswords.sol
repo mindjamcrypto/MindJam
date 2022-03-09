@@ -72,6 +72,12 @@ contract Crosswords is ReentrancyGuard {
         require(_id < crosswords.length, "Index out of bound!");
         uint256 price = crosswords[_id].squarePrice;
 
+        // Make sure the player has enough tokens
+        require(
+            mjToken.balanceOf(msg.sender) >= price,
+            "You don't have enough tokens!"
+        );
+
         // Check for allowance
         require(
             mjToken.allowance(msg.sender, address(this)) >= price,
@@ -89,6 +95,12 @@ contract Crosswords is ReentrancyGuard {
     function requestWord(uint256 _id) external {
         require(_id < crosswords.length, "Index out of bound!");
         uint256 price = crosswords[_id].wordPrice;
+
+        // Make sure the player has enough tokens
+        require(
+            mjToken.balanceOf(msg.sender) >= price,
+            "You don't have enough tokens!"
+        );
 
         // Check for allowance
         require(

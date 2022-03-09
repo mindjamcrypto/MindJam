@@ -2,8 +2,6 @@ const { ethers } = require("hardhat")
 const { BigNumber } = require("ethers")
 const { expect } = require("chai")
 const fs = require("fs")
-const { isTypedArray } = require("util/types")
-const { Console } = require("console")
 
 const crosswordsAddress = "0x565Cd30539508CF67D1F01747423D30306C3dE27"
 const crosswordsAbi = JSON.parse(fs.readFileSync("artifacts/contracts/Crosswords.sol/Crosswords.json")).abi
@@ -54,22 +52,31 @@ describe("Crosswords and token contract on Mumbai testnet", () => {
 
     describe("Hint requests", () => {
 
-        it("There should be enough tokens in owner's wallet", async () => {
-            expect(parseInt(ethers.utils.formatEther(await token.balanceOf(owner.address))))
-                .to.be.greaterThanOrEqual(25)
+        before(async () => {
+            // If the owner has less than 25 tokens, mint him some
+            if ((await token.balanceOf(owner.address)).lt(toEth(25))) {
+                await tokenOwner.mint(owner.address, toEth(100))
+            }
         })
 
         it("Shouldn't allow to request hints if not enough allowance", async () => {
             // Make sure there's no allowance for S1 spending
             if ((await token.allowance(s1.address, crosswords.address)).gt(0)) {
-                await tokenS1.aprove(crosswords.address, 0)
+                await tokenS1.approve(crosswords.address, 0)
                 console.log("Revoked approve for S1 spending")
             }
             await expect(crosswordsS1.requestWord(0)).to.be.reverted
         })
 
+        it("Shouldn't allow if the requestor doesn't have enough tokens", async () => {
+            expect(parseInt(ethers.utils.formatEther(await token.balanceOf(s1.address))))
+                .to.be.lessThan(10)
+
+            await expect(crosswordsS1.requestSquare(0)).to.be.reverted
+        })
+
         it("Should allow if enough tokens are paid", async () => {
-            // Make sure there's enough allowance
+            // Make sure there's enough allowance and balance
             if ((await token.allowance(owner.address, crosswords.address)).lt(toEth(25))) {
                 await tokenOwner.approve(crosswords.address, toEth(25))
                     .then(r => { console.log("Approved 25 tokens!") })
@@ -78,6 +85,13 @@ describe("Crosswords and token contract on Mumbai testnet", () => {
                 .to.be.greaterThanOrEqual(25)
 
             // Make sure the hints can be requested
+            // await expect(crosswordsOwner.requestSquare(0))
+            //     .to.emit(crosswords, "RequestSquare")
+            //     .withArgs(owner.address, 0)
+
+            // await expect(crosswordsOwner.requestWord(0))
+            //     .to.emit(crosswords, "RequestWord")
+            //     .withArgs(owner.address, 0)
 
         })
     })
