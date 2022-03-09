@@ -25,6 +25,7 @@ const NavLink = ({ children }: { children: ReactNode }) => (
       textDecoration: "none",
       bg: "blackAlpha.400",
     }}
+    bg={"blue.900"}
     fontWeight={"540"}
     to={`/${children}`}
     as={ReactRouter}
@@ -40,7 +41,6 @@ export const Header = () => {
     <>
       <Box>
         <Flex h={16}>
-          <Logo />
           <IconButton
             size={"md"}
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -54,7 +54,7 @@ export const Header = () => {
             as={"nav"}
             spacing={10}
             display={{ base: "none", md: "flex" }}
-            marginLeft="240px"
+            marginLeft="250px"
             alignItems={"center"}
             justifyContent={"space-between"}
           >

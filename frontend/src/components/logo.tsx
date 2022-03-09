@@ -15,9 +15,9 @@ export const Logo = () => {
             }}
             src={levelUp}
             marginBottom={{
-              base: "-36px",
-              md: "-86px",
-              xl: "-136px",
+              base: "-100px",
+              md: "-150px",
+              xl: "-200px",
             }}
           />
         </Link>
