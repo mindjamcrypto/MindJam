@@ -13,7 +13,7 @@ import { Link as ReactRouter } from "react-router-dom";
 import { Logo } from "./logo";
 import { useState } from "react";
 declare var window: any;
-const Links = ["Games", "Create", "Team"];
+const Links = ["GAMES", "CREATE", "TEAM"];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -52,7 +52,7 @@ export const Header = () => {
           />
           <HStack
             as={"nav"}
-            spacing={4}
+            spacing={10}
             display={{ base: "none", md: "flex" }}
             marginLeft="240px"
             alignItems={"center"}
