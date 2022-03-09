@@ -201,6 +201,10 @@ function CrosswordPuzzle() {
       alert("Try Again!");
     }
   };
+  const handleTokenPayments = async (numTokens:number) => {
+    //Check if wallet is installed
+    //Connect the wallet
+  };
 
   useEffect(() => {
     async function fetchData() {

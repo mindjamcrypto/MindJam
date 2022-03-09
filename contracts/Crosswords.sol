@@ -42,12 +42,14 @@ contract Crosswords is ReentrancyGuard {
      * @param _squarePrice Number of tokens required to request an hint
      * @param _wordPrice Number of tokens required to reveal a word
      * @param _challengePrize Number of tokens to be minted to who wins the 24 hour challenge
+     * @return id The index of the newly created crossword
      */
     function newCrossword(
         uint256 _squarePrice,
         uint256 _wordPrice,
         uint256 _challengePrize
-    ) external {
+    ) external returns (uint256 id) {
+        id = crosswords.length;
         crosswords.push(
             Crossword(
                 _squarePrice,
@@ -56,7 +58,7 @@ contract Crosswords is ReentrancyGuard {
                 address(0), // winner addres initialized to 0
                 false, // winner has not been payed yet
                 block.timestamp, // time of creation of the crossword
-                crosswords.length, // crossword id
+                id, // crossword id
                 0 // record time initialized to 0
             )
         );
@@ -67,7 +69,14 @@ contract Crosswords is ReentrancyGuard {
      * @param _id the id of the crossword for which the hint is requested
      */
     function requestSquare(uint256 _id) external {
+        require(_id < crosswords.length, "Index out of bound!");
         uint256 price = crosswords[_id].squarePrice;
+
+        // Make sure the player has enough tokens
+        require(
+            mjToken.balanceOf(msg.sender) >= price,
+            "You don't have enough tokens!"
+        );
 
         // Check for allowance
         require(
@@ -84,7 +93,14 @@ contract Crosswords is ReentrancyGuard {
 
     // Request a word reveal
     function requestWord(uint256 _id) external {
+        require(_id < crosswords.length, "Index out of bound!");
         uint256 price = crosswords[_id].wordPrice;
+
+        // Make sure the player has enough tokens
+        require(
+            mjToken.balanceOf(msg.sender) >= price,
+            "You don't have enough tokens!"
+        );
 
         // Check for allowance
         require(
@@ -116,18 +132,19 @@ contract Crosswords is ReentrancyGuard {
      * @return true if player has put a new record time and the challenge is still on
      */
     // HACK CONCERN: anyone can call this function!
-    function sessionEnded(
+    function endSession(
         uint256 _id,
         uint256 _time,
         address _player
     ) external returns (bool) {
         require(_time > 0, "Time can't be 0!");
+        require(_id < crosswords.length, "Index out of bound!");
 
         Crossword memory crossword = crosswords[_id]; // gas saver
         if (!isChallengeOn(_id)) return false;
 
         // If it's the first time this game is played, or we have a new record
-        // Record the new time and set the player as winner
+        // Register the new time and set the player as winner
         if (crossword.recordTime == 0 || _time < crossword.recordTime) {
             crosswords[_id].recordTime = _time;
             crosswords[_id].winner = _player;
@@ -136,7 +153,7 @@ contract Crosswords is ReentrancyGuard {
         return false;
     }
 
-    /**@dev If the challenge is over, it returns the address of the winner
+    /**@dev Returns the address of the winner
      * @param _id the id of the crossword you want the winner of
      */
     function getWinner(uint256 _id) public view returns (address) {
@@ -157,7 +174,8 @@ contract Crosswords is ReentrancyGuard {
         require(!crossword.winnerPaid, "The winner has already been paid!");
 
         crosswords[_id].winnerPaid = true;
-        mjToken.payWinner(msg.sender, crossword.challengePrize);
+        bool sent = mjToken.transfer(msg.sender, crossword.challengePrize);
+        require(sent, "Transaction rejected");
     }
 
     /**@dev Withdraw all the mJTokens to specified address
@@ -166,5 +184,13 @@ contract Crosswords is ReentrancyGuard {
         uint256 balance = mjToken.balanceOf(address(this));
         require(balance > 0, "No tokens to transfer");
         mjToken.transfer(_to, balance);
+    }
+
+    /** Given a crossword ID, it tells whether the winner has already been payed
+     * @param _id ID of the crossword game
+     * @return bool
+     */
+    function hasWinnerBeenPaid(uint256 _id) external view returns (bool) {
+        return crosswords[_id].winnerPaid;
     }
 }
