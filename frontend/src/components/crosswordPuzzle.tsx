@@ -84,16 +84,24 @@ function CrosswordPuzzle() {
   window.ethereum.on("accountsChanged", function (accounts: Array<string>) {
     setAccountState(accounts[0]);
   });
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   //CROSSWORD LOGIC
-  const onCrosswordCorrect = useCallback((isCorrect: boolean) => {
-    // console.log(isCorrect);
-    const endTime = Date.now();
-    console.log(endTime);
-    //TODO Add session end time ^ to database with the User Address
-    setIsCorrectValue(isCorrect);
-  }, []);
+  const onCrosswordCorrect = useCallback(
+    async (isCorrect: boolean) => {
+      // console.log(isCorrect);
+      const endTime = Date.now();
+      //TODO Add session start time ^ to database with the User Address
+      await axios.get("http://localhost:3001/sessionEnd/", {
+        params: {
+          date: endTime,
+          GameID: crosswordData!._id,
+          account: account,
+        },
+      });
+      setIsCorrectValue(isCorrect);
+    },
+    [crosswordData]
+  );
 
   const onCorrect = useCallback(
     (direction, number, answer) => {
@@ -142,30 +150,35 @@ function CrosswordPuzzle() {
     [crosswordData]
   );
 
-  const handleBeginSession = async () => {
+  const handleBeginSession = useCallback(async () => {
+    console.log(crosswordData);
     const startTime = Date.now();
-    //TODO Add session start time ^ to database with the User Address
-    await axios.get("http://localhost:3001/sessionStart/", {
+    // if there is not a session in the database already
+    console.log(startTime);
+    console.log("ACCOUNT", account);
+    const hasSession = await axios.get("http://localhost:3001/sessionCheck/", {
       params: {
-        date: startTime,
-        GameID: crosswordData!._id,
+        gameID: crosswordData?._id,
         account: account,
       },
     });
-    setSessionStart(true);
-  };
+    if (hasSession.data) {
+      //already started session so do not add another doc
+      setSessionStart(true);
+    } else {
+      await axios.post("http://localhost:3001/sessionStart/", {
+        params: {
+          startTime: startTime,
+          GameID: crosswordData!._id,
+          account: account,
+        },
+      });
+      setSessionStart(true);
+    }
+  }, [crosswordData, account]);
 
-  const handleEndSession = async () => {
-    const endTime = Date.now();
-    //TODO Add session start time ^ to database with the User Address
-    await axios.get("http://localhost:3001/sessionEnd/", {
-      params: {
-        date: endTime,
-        GameID: crosswordData!._id,
-        account: account,
-      },
-    });
-    setSessionStart(true);
+  const handleSubmitToSM = async () => {
+    console.log("SUbmit to smart contract here");
   };
 
   const handleCheckWord = async () => {
@@ -193,7 +206,7 @@ function CrosswordPuzzle() {
       fetchData();
     }
   }, [id]);
-  console.log(!account.length);
+  console.log(crosswordData);
   if (!account.length) {
     return (
       <Flex justifyContent="center" alignItems="center" height="800px">
@@ -284,7 +297,7 @@ function CrosswordPuzzle() {
               pt={"10px"}
               height="700px"
             >
-              <Button w="50%" colorScheme="green" onClick={handleEndSession}>
+              <Button w="50%" colorScheme="green" onClick={handleSubmitToSM}>
                 Submit!
               </Button>
             </Flex>
