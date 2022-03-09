@@ -65,6 +65,7 @@ function saveFrontendFiles(mtoken, crosswords, mjNFT) {
 
   const MtokenArtifact = artifacts.readArtifactSync("MindJam");
   const CrosswordsArtifact = artifacts.readArtifactSync("Crosswords");
+  const MNFTArtifact = artifacts.readArtifactSync("MindJamNFT");
 
   fs.writeFileSync(
     contractsDir + "/MindJam.json",
@@ -73,6 +74,10 @@ function saveFrontendFiles(mtoken, crosswords, mjNFT) {
   fs.writeFileSync(
     contractsDir + "/Crosswords.json",
     JSON.stringify(CrosswordsArtifact, null, 2)
+  );
+  fs.writeFileSync(
+    contractsDir + "/MindJamNFT.json",
+    JSON.stringify(MNFTArtifact, null, 2)
   );
 }
 

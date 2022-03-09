@@ -7,7 +7,7 @@
     "@chakra-ui/react": "^1.8.3",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "@jaredreisinger/react-crossword": "^4.3.0",
+    "@jaredreisinger/react-crossword": "^4.3.1",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^10.4.9",
     "@testing-library/user-event": "^12.8.3",
@@ -45,5 +45,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/react-router-dom": "^5.3.3"
   }
 }
