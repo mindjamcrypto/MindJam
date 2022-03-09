@@ -122,7 +122,6 @@ function CrosswordPuzzle() {
   );
   const fillOneCell = useCallback(
     (event) => {
-      console.log(crosswordData);
       const hint = crosswordData?.GameData.revealSquares[0]; //TODO should the hints be random? how many hints?
       crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
     },
@@ -131,7 +130,6 @@ function CrosswordPuzzle() {
 
   const fillMultipleCells = useCallback(
     (event) => {
-      console.log(crosswordData?.GameData.revealWords);
       let revWord = crosswordData?.GameData.revealWords[0]; //TODO should the hints be random? how many hints?
       [...revWord!.word].forEach((letter, i) => {
         if (revWord!.direction === "across") {
@@ -151,11 +149,8 @@ function CrosswordPuzzle() {
   );
 
   const handleBeginSession = useCallback(async () => {
-    console.log(crosswordData);
     const startTime = Date.now();
     // if there is not a session in the database already
-    console.log(startTime);
-    console.log("ACCOUNT", account);
     const hasSession = await axios.get("http://localhost:3001/sessionCheck/", {
       params: {
         gameID: crosswordData?._id,
@@ -164,8 +159,10 @@ function CrosswordPuzzle() {
     });
     if (hasSession.data) {
       //already started session so do not add another doc
+      console.log("ALREADY HAS SESSION in DB");
       setSessionStart(true);
     } else {
+      console.log("CREATING NEW SESSION");
       await axios.post("http://localhost:3001/sessionStart/", {
         params: {
           startTime: startTime,
@@ -178,7 +175,7 @@ function CrosswordPuzzle() {
   }, [crosswordData, account]);
 
   const handleSubmitToSM = async () => {
-    console.log("SUbmit to smart contract here");
+    console.log("Submit to smart contract here");
   };
 
   const handleCheckWord = async () => {
@@ -206,7 +203,7 @@ function CrosswordPuzzle() {
       fetchData();
     }
   }, [id]);
-  console.log(crosswordData);
+
   if (!account.length) {
     return (
       <Flex justifyContent="center" alignItems="center" height="800px">
