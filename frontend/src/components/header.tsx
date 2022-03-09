@@ -38,7 +38,7 @@ export const Header = () => {
 
   return (
     <>
-      <Box px={4}>
+      <Box>
         <Flex h={16}>
           <Logo />
           <IconButton
