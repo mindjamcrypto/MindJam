@@ -23,6 +23,8 @@ import { crosswordList } from "../constants/dummyData/crosswordList";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
+import { getSquareHint } from "../actions/CrosswordsActions";
+
 declare var window: any;
 type CrosswordParams = {
   id: string;
@@ -124,13 +126,10 @@ function CrosswordPuzzle() {
     },
     [correctWordArray]
   );
-  const fillOneCell = useCallback(
-    (event) => {
-      const hint = crosswordData?.GameData.revealSquares[0]; //TODO should the hints be random? how many hints?
-      crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
-    },
-    [crosswordData]
-  );
+  const fillOneCell = useCallback(() => {
+    const hint = crosswordData?.GameData.revealSquares[0];
+    crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
+  }, [crosswordData]);
 
   const fillMultipleCells = useCallback(
     (event) => {
@@ -151,6 +150,17 @@ function CrosswordPuzzle() {
     },
     [crosswordData]
   );
+
+  const handleRevealLetter = async () => {
+    // //make call to smart contract
+    // const paid = await getSquareHint(
+    //   account,
+    //   0,
+    //   crosswordData?.PaidActionObject.square
+    // ); //hardcoded until we figure out ids
+    // console.log(paid);
+    fillOneCell();
+  };
 
   const handleBeginSession = useCallback(async () => {
     const startTime = Date.now();
@@ -286,7 +296,7 @@ function CrosswordPuzzle() {
                   >
                     Get Help
                   </Heading>
-                  <Button onClick={fillOneCell}> Reveal Square</Button>
+                  <Button onClick={handleRevealLetter}> Reveal Square</Button>
                   <Button onClick={fillMultipleCells}> Reveal Word</Button>
                   <Button onClick={reset}>Reset</Button>
                 </VStack>
