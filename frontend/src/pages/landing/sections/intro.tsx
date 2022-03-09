@@ -6,7 +6,11 @@ import { url } from "inspector";
 import { Header } from "../../../components/header";
 export const Intro = () => {
   return (
-    <Box backgroundPosition="center" backgroundImage={`url(${globeBanner})`}>
+    <Box
+      backgroundPosition="center"
+      backgroundImage={`url(${globeBanner})`}
+      backgroundSize={"cover"}
+    >
       <Header />
       <Box
         w="full"
@@ -15,51 +19,20 @@ export const Intro = () => {
           md: "100px",
           xl: "200px",
         }}
-        py="400px"
+        py="450px"
       >
-        <Flex justifyContent="center" alignItems="center">
+        <Flex justifyContent="center" alignItems="center" marginLeft={"60%"}>
           <Heading
             fontSize={{
               base: 30,
-              md: 54,
-              xl: 64,
+              md: 40,
+              xl: 50,
             }}
-            letterSpacing="6px"
             color="whiteAlpha.900"
+            fontWeight={"900"}
           >
-            MindJam
+            Taking your game to the next level on Web3
           </Heading>
-        </Flex>
-        <Flex justifyContent="center" alignItems="center" pb="30px">
-          <Box
-            fontSize={{
-              base: 20,
-              md: 30,
-              xl: 40,
-            }}
-            letterSpacing="6px"
-            color="whiteAlpha.900"
-          >
-            Mind Games on the Blockchain
-          </Box>
-        </Flex>
-        <Flex justifyContent="center" alignItems="center" pb="30px">
-          <Link
-            px={2}
-            py={1}
-            rounded={"md"}
-            bg={"#94fc64"}
-            color={"blackAlpha.900"}
-            fontSize={"30px"}
-            _hover={{
-              textDecoration: "none",
-              bg: "whiteAlpha.900",
-            }}
-            as={ReactRouter}
-            to={"/games"}
-          >
-            Start playing now!
-          </Link>
         </Flex>
       </Box>
     </Box>

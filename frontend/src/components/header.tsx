@@ -20,11 +20,12 @@ const NavLink = ({ children }: { children: ReactNode }) => (
     px={2}
     py={1}
     rounded={"md"}
-    color={"#a7fc5a"}
+    color={"whiteAlpha.900"}
     _hover={{
       textDecoration: "none",
       bg: "blackAlpha.400",
     }}
+    fontWeight={"540"}
     to={`/${children}`}
     as={ReactRouter}
   >
