@@ -42,13 +42,14 @@ contract Crosswords is ReentrancyGuard {
      * @param _squarePrice Number of tokens required to request an hint
      * @param _wordPrice Number of tokens required to reveal a word
      * @param _challengePrize Number of tokens to be minted to who wins the 24 hour challenge
-     * @return index The index of the newly created crossword
+     * @return id The index of the newly created crossword
      */
     function newCrossword(
         uint256 _squarePrice,
         uint256 _wordPrice,
         uint256 _challengePrize
-    ) external returns (uint256) {
+    ) external returns (uint256 id) {
+        id = crosswords.length;
         crosswords.push(
             Crossword(
                 _squarePrice,
@@ -57,11 +58,10 @@ contract Crosswords is ReentrancyGuard {
                 address(0), // winner addres initialized to 0
                 false, // winner has not been payed yet
                 block.timestamp, // time of creation of the crossword
-                crosswords.length, // crossword id
+                id, // crossword id
                 0 // record time initialized to 0
             )
         );
-        return crosswords.length - 1;
     }
 
     /**
@@ -144,7 +144,7 @@ contract Crosswords is ReentrancyGuard {
         if (!isChallengeOn(_id)) return false;
 
         // If it's the first time this game is played, or we have a new record
-        // Record the new time and set the player as winner
+        // Register the new time and set the player as winner
         if (crossword.recordTime == 0 || _time < crossword.recordTime) {
             crosswords[_id].recordTime = _time;
             crosswords[_id].winner = _player;
