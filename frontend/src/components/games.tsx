@@ -17,6 +17,7 @@ import Wordle from "../constants/images/Wordle.png";
 import WordSearch from "../constants/images/WordSearch.png";
 import { Error } from "../components/error";
 import { Loading } from "./loading";
+import { Header } from "./header";
 const imageObject = {
   1: Crossword,
   2: Wordle,
@@ -45,43 +46,52 @@ export const Games = () => {
     return <Loading />;
   } else {
     return (
-      <Box
-        w="full"
-        bg="whiteAlpha.900"
-        px={{
-          base: "50px", // 0-48em
-          md: "100px", // 48em-80em,
-          xl: "200px", // 80em+
-        }}
-        py="60px"
-      >
-        <Flex justifyContent="center" alignItems="center">
-          <Heading
-            fontSize={{
-              base: 20, // 0-48em
-              md: 44, // 48em-80em,
-              xl: 54, // 80em+
-            }}
-            letterSpacing="6px"
-            pb="15px"
-          >
-            Choose a game!
-          </Heading>
-        </Flex>
-        <Flex justifyContent="center" alignItems="center">
-          <Grid templateColumns="repeat(2, 1fr)" gap={12}>
-            {gameTypeList?.map((game) => (
-              <GridItem key={game["gameTypeName"]}>
-                <Link as={ReactRouter} to={`/${game["gameTypeName"]}selection`}>
-                  <Image
-                    boxSize="150px"
-                    src={imageObject[game["gameTypeID"]]}
-                  />
-                </Link>
-              </GridItem>
-            ))}
-          </Grid>
-        </Flex>
+      <Box>
+        <Box bg={"#09245e"}>
+          <Header />
+        </Box>
+
+        <Box
+          w="full"
+          bg="whiteAlpha.900"
+          px={{
+            base: "50px", // 0-48em
+            md: "100px", // 48em-80em,
+            xl: "200px", // 80em+
+          }}
+          py="60px"
+        >
+          <Flex justifyContent="center" alignItems="center">
+            <Heading
+              fontSize={{
+                base: 20, // 0-48em
+                md: 44, // 48em-80em,
+                xl: 54, // 80em+
+              }}
+              letterSpacing="6px"
+              pb="15px"
+            >
+              Choose a game!
+            </Heading>
+          </Flex>
+          <Flex justifyContent="center" alignItems="center">
+            <Grid templateColumns="repeat(2, 1fr)" gap={12}>
+              {gameTypeList?.map((game) => (
+                <GridItem key={game["gameTypeName"]}>
+                  <Link
+                    as={ReactRouter}
+                    to={`/${game["gameTypeName"]}selection`}
+                  >
+                    <Image
+                      boxSize="150px"
+                      src={imageObject[game["gameTypeID"]]}
+                    />
+                  </Link>
+                </GridItem>
+              ))}
+            </Grid>
+          </Flex>
+        </Box>
       </Box>
     );
   }
