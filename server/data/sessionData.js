@@ -18,18 +18,19 @@ async function addEndSession(endTime, gameID, account) {
   const res = await SessionCollection.updateOne(
     { PlayerId: account, GameID: gameID },
     {
-      SessionEndTime: endTime,
-      FinalResult: true,
+      $set: { SessionEndTime: endTime, FinalResult: true },
     }
   );
+  console.log("UPDATE?", res);
   return res;
 }
 
 async function checkSession(gameID, account) {
   const SessionCollection = await Session();
+  console.log("gameID", gameID);
   const res = await SessionCollection.findOne({
     GameID: gameID,
-    PlayerID: account,
+    PlayerId: account,
   });
   console.log(res);
 

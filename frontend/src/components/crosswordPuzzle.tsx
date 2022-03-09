@@ -90,11 +90,11 @@ function CrosswordPuzzle() {
     async (isCorrect: boolean) => {
       // console.log(isCorrect);
       const endTime = Date.now();
-      //TODO Add session start time ^ to database with the User Address
-      await axios.get("http://localhost:3001/sessionEnd/", {
+      console.log("UPDATING SESSION WITH END TIME");
+      await axios.post("http://localhost:3001/session/end", {
         params: {
-          date: endTime,
-          GameID: crosswordData!._id,
+          endTime: endTime,
+          gameID: crosswordData!._id,
           account: account,
         },
       });
@@ -151,22 +151,24 @@ function CrosswordPuzzle() {
   const handleBeginSession = useCallback(async () => {
     const startTime = Date.now();
     // if there is not a session in the database already
-    const hasSession = await axios.get("http://localhost:3001/sessionCheck/", {
+    console.log(crosswordData?._id);
+    const hasSession = await axios.get("http://localhost:3001/session/check", {
       params: {
         gameID: crosswordData?._id,
         account: account,
       },
     });
+    console.log(hasSession);
     if (hasSession.data) {
       //already started session so do not add another doc
       console.log("ALREADY HAS SESSION in DB");
       setSessionStart(true);
     } else {
       console.log("CREATING NEW SESSION");
-      await axios.post("http://localhost:3001/sessionStart/", {
+      await axios.post("http://localhost:3001/session/start", {
         params: {
           startTime: startTime,
-          GameID: crosswordData!._id,
+          gameID: crosswordData!._id,
           account: account,
         },
       });
@@ -210,7 +212,7 @@ function CrosswordPuzzle() {
         <Button onClick={handleSubmit}>Connect Wallet</Button>
       </Flex>
     );
-  } else if (account && !sessionStart) {
+  } else if (account && !sessionStart && crosswordData) {
     return (
       <Flex justifyContent="center" alignItems="center" height="800px">
         <VStack>
