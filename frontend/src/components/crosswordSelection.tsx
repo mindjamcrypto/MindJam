@@ -50,7 +50,7 @@ export const CrosswordSelection = () => {
     async function fetchData() {
       try {
         await axios.get("http://localhost:3001/crosswords").then((result) => {
-          //console.log(result.data);
+          console.log(result.data);
           setCrosswordData(result.data);
           setLoading(false);
         });

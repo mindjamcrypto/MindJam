@@ -145,9 +145,29 @@ function CrosswordPuzzle() {
   const handleBeginSession = async () => {
     const startTime = Date.now();
     //TODO Add session start time ^ to database with the User Address
-    console.log(startTime);
+    await axios.get("http://localhost:3001/sessionStart/", {
+      params: {
+        date: startTime,
+        GameID: crosswordData!._id,
+        account: account,
+      },
+    });
     setSessionStart(true);
   };
+
+  const handleEndSession = async () => {
+    const endTime = Date.now();
+    //TODO Add session start time ^ to database with the User Address
+    await axios.get("http://localhost:3001/sessionEnd/", {
+      params: {
+        date: endTime,
+        GameID: crosswordData!._id,
+        account: account,
+      },
+    });
+    setSessionStart(true);
+  };
+
   const handleCheckWord = async () => {
     if (correctWordArray.includes(checkWordId)) {
       alert("Correct!");
@@ -169,10 +189,10 @@ function CrosswordPuzzle() {
         return <Error />;
       }
     }
-    if (sessionStart) {
+    if (id) {
       fetchData();
     }
-  }, [id, sessionStart]);
+  }, [id]);
   console.log(!account.length);
   if (!account.length) {
     return (
@@ -264,7 +284,7 @@ function CrosswordPuzzle() {
               pt={"10px"}
               height="700px"
             >
-              <Button w="50%" colorScheme="green">
+              <Button w="50%" colorScheme="green" onClick={handleEndSession}>
                 Submit!
               </Button>
             </Flex>
