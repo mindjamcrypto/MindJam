@@ -90,7 +90,7 @@ export const Create = () => {
             type="email"
             placeholder="<Clue Number>. <clue>, <answer>, <row#>, <col#>"
           />
-          <Button onClick={handleSubmit} pt={"10px"}>
+          <Button onClick={handleSubmit} mt={"10px"}>
             Create puzzle
           </Button>
         </FormControl>
