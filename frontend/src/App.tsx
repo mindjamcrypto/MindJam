@@ -14,6 +14,7 @@ const theme = extendTheme({
   fonts: {
     heading: "Montserrat, sans-serif",
     link: "Montserrat, sans-serif",
+    text: "Montserrat, sans-serif",
   },
 });
 export const App = () => (
