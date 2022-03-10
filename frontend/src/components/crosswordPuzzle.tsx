@@ -16,7 +16,7 @@ import {
   NumberInput,
   NumberInputStepper,
   Text,
-  
+  Spinner,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -27,6 +27,9 @@ import { Loading } from "../components/loading";
 import { getSquareHint } from "../actions/CrosswordsActions";
 import { mintNFT } from "../utils/nftMinter";
 import { Header } from "./header";
+import { ethers } from "ethers";
+import crosswordsContract from "../contracts/Crosswords.json";
+import contractAdresses from "../contracts/contract-address.json";
 declare var window: any;
 type CrosswordParams = {
   id: string;
@@ -60,11 +63,13 @@ type GameData = {
   title: string;
   revealWords: Array<revealWord>;
 };
+const provider = new ethers.providers.Web3Provider(window.ethereum);
 
 function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
   const crossword = useRef<CrosswordImperative>(null);
   const [loading, setLoading] = useState(true);
+  const [squareWaiting, setSquareWaiting] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("Loading...");
   const [sessionStart, setSessionStart] = useState(false);
   const [crosswordData, setCrosswordData] = useState<mongoFormat>();
@@ -72,7 +77,9 @@ function CrosswordPuzzle() {
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
   const [checkWordId, setCheckWordId] = useState("");
   const [status, setStatus] = useState("");
-
+  const [ethersCrosswordContract, setEthersCrosswordContract] =
+    useState<ethers.Contract>();
+  const [userSigner, setUserSigner] = useState<ethers.Signer>();
   //METAMASK CONNECT LOGIC
   const [account, setAccountState] = useState("");
   const connectUsersMeta = async () => {
@@ -156,14 +163,14 @@ function CrosswordPuzzle() {
   );
 
   const handleRevealLetter = async () => {
-    // //make call to smart contract
-    // const paid = await getSquareHint(
-    //   account,
-    //   0,
-    //   crosswordData?.PaidActionObject.square
-    // ); //hardcoded until we figure out ids
-    // console.log(paid);
-    fillOneCell();
+    //make call to smart contract
+
+    const paid = await getSquareHint(
+      account,
+      0,
+      crosswordData?.PaidActionObject.square
+    ); //hardcoded until we figure out ids
+    setSquareWaiting(true);
   };
 
   const handleBeginSession = useCallback(async () => {
@@ -232,6 +239,41 @@ function CrosswordPuzzle() {
     }
     //setIsCorrectValue(true); //testing==================
   }, [id]);
+
+  useEffect(() => {
+    // listen for event
+    if (account) {
+      ethersCrosswordContract!.on("RequestSquare", onRequestSquare);
+      console.log("Turning on RequestSquare , & open listener");
+    }
+    return () => {
+      if (account) {
+        ethersCrosswordContract!.off("RequestSquare", onRequestSquare);
+        console.log("Turning off Lotto ticket minted, & close listener");
+      }
+    };
+  }, [account]);
+
+  useEffect(() => {
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const crosswordsC = new ethers.Contract(
+        contractAdresses.Crosswords,
+        crosswordsContract.abi,
+        signer
+      );
+
+      setEthersCrosswordContract(crosswordsC);
+    }
+  }, []);
+
+  const onRequestSquare = async (account: String, cid: number) => {
+    console.log("REVEAL SQUARE EMITTED:", account, "cid:", cid);
+    setSquareWaiting(false);
+    fillOneCell();
+  };
 
   if (!account.length) {
     return (
@@ -322,8 +364,21 @@ function CrosswordPuzzle() {
                   >
                     Get Help
                   </Heading>
-                  <Button onClick={handleRevealLetter}> Reveal Square</Button>
-                  <Button onClick={fillMultipleCells}> Reveal Word</Button>
+                  <Button onClick={handleRevealLetter}>
+                    Reveal Square -{">"} Cost: 10 MJ
+                  </Button>
+                  {squareWaiting ? (
+                    <Flex alignItems={"center"}>
+                      <Text marginRight="2">Revealing </Text>
+                      <Spinner />
+                    </Flex>
+                  ) : (
+                    ""
+                  )}
+                  <Button onClick={fillMultipleCells}>
+                    {" "}
+                    Reveal Word -{">"} Cost: 15 MJ
+                  </Button>
                   <Button onClick={reset}>Reset</Button>
                 </VStack>
               </Box>

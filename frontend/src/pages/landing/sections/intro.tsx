@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Text, Flex, Heading, Link } from "@chakra-ui/react";
 import { Link as ReactRouter } from "react-router-dom";
 import globeBanner from "../../../constants/images/globeBanner.png";
-import { url } from "inspector";
+
 import { Logo } from "../../../components/logo";
 import { Header } from "../../../components/header";
 export const Intro = () => {

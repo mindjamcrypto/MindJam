@@ -7,11 +7,12 @@ import {
   IconButton,
   useDisclosure,
   Stack,
+  Heading,
+  Image,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link as ReactRouter } from "react-router-dom";
-import { Logo } from "./logo";
-import { useState } from "react";
+import levelUp from "../constants/images/levelUp.png";
 declare var window: any;
 const Links = ["GAMES", "CREATE", "TEAM"];
 

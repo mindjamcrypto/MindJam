@@ -1,6 +1,6 @@
 const { ethers } = require("ethers");
 const crosswordsContract = require("../contracts/Crosswords.json");
-const MindJam = require("../contracts/MindJam.json");
+const MindJam = require("../contracts/MindJamTestnet.json");
 const contractAdresses = require("../contracts/contract-address.json");
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -21,14 +21,7 @@ export const getSquareHint = async (address, id, price) => {
 
   await mindJam
     .connect(signer)
-    ._beforeTokenTransfer(signer.address, crosswords.address, price.toString());
+    .approve(crosswords.address, ethers.utils.parseEther(price.toString()));
 
-  await crosswords.connect(signer).requestSquare(id);
-
-  provider.on("RequestSquareReveal", (_address, _id) => {
-    if (_address === address && id == id) {
-      res = true;
-    }
-  });
-  return res ? res : false;
+  return await crosswords.connect(signer).requestSquare(id);
 };
