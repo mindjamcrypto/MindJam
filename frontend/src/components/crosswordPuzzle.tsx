@@ -15,6 +15,7 @@ import {
   NumberIncrementStepper,
   NumberInput,
   NumberInputStepper,
+  Text,
   
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
@@ -24,6 +25,8 @@ import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
 import { getSquareHint } from "../actions/CrosswordsActions";
+import { mintNFT } from "../utils/nftMinter";
+
 
 declare var window: any;
 type CrosswordParams = {
@@ -63,11 +66,13 @@ function CrosswordPuzzle() {
   let { id } = useParams<CrosswordParams>();
   const crossword = useRef<CrosswordImperative>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMsg, setLoadingMsg] = useState("Loading...");
   const [sessionStart, setSessionStart] = useState(false);
   const [crosswordData, setCrosswordData] = useState<mongoFormat>();
   const [isCorrect, setIsCorrectValue] = useState(false);
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
   const [checkWordId, setCheckWordId] = useState("");
+  const [status, setStatus] = useState("");
 
   //METAMASK CONNECT LOGIC
   const [account, setAccountState] = useState("");
@@ -191,7 +196,11 @@ function CrosswordPuzzle() {
   }, [crosswordData, account]);
 
   const handleSubmitToSM = async () => {
+    setLoading(true);
+    setLoadingMsg("Congratulations! We are minting your free NFT!");
+    await handleNFTMinting('completor');
     console.log("Submit to smart contract here");
+    setLoading(false);
   };
 
   const handleCheckWord = async () => {
@@ -201,10 +210,10 @@ function CrosswordPuzzle() {
       alert("Try Again!");
     }
   };
-  const handleTokenPayments = async (numTokens:number) => {
-    //Check if wallet is installed
-    //Connect the wallet
-  };
+  const handleNFTMinting = async (nftType:String) => { //TODO: implement
+    const {status} = await mintNFT(nftType);
+    setStatus(status);
+    };
 
   useEffect(() => {
     async function fetchData() {
@@ -222,6 +231,7 @@ function CrosswordPuzzle() {
     if (id) {
       fetchData();
     }
+    setIsCorrectValue(true); //testing==================
   }, [id]);
 
   if (!account.length) {
@@ -243,7 +253,7 @@ function CrosswordPuzzle() {
       </Flex>
     );
   } else if (loading) {
-    return <Loading />;
+    return <Loading msg={loadingMsg} />;
   } else {
     if (crosswordData) {
       return (
@@ -314,9 +324,10 @@ function CrosswordPuzzle() {
               pt={"10px"}
               height="700px"
             >
-              <Button w="50%" colorScheme="green" onClick={handleSubmitToSM}>
+              <Button w="50%" colorScheme="green" onClick={handleSubmitToSM} >
                 Submit!
               </Button>
+              <Text fontSize='md' id="status">        {status}      </Text>
             </Flex>
           ) : (
             ""

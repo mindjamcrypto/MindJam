@@ -27,6 +27,7 @@ const imageObject = {
 export const Games = () => {
   const [gameTypeList, setGameTypeList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMsg, setLoadingMsg] = useState("Loading...");
   useEffect(() => {
     async function fetchData() {
       try {
@@ -42,7 +43,7 @@ export const Games = () => {
   }, []);
 
   if (loading) {
-    return <Loading />;
+    return <Loading msg={loadingMsg}/>;
   } else {
     return (
       <Box

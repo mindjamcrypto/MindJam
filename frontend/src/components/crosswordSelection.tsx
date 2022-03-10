@@ -46,6 +46,7 @@ type GameData = {
 export const CrosswordSelection = () => {
   const [crosswordData, setCrosswordData] = useState<Array<mongoFormat>>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMsg, setLoadingMsg] = useState("Loading...");
   useEffect(() => {
     async function fetchData() {
       try {
@@ -62,7 +63,7 @@ export const CrosswordSelection = () => {
   }, []);
 
   if (loading) {
-    return <Loading />;
+    return <Loading msg={loadingMsg} />;
   } else {
     return (
       <Box

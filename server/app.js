@@ -6,6 +6,8 @@ var logger = require("morgan");
 var crosswordsRouter = require("./routes/crosswords");
 var gameTypesRouter = require("./routes/gameTypes");
 var sessionRouter = require("./routes/session");
+var tokenURIRouter = require("./routes/tokenURI");
+
 var cors = require("cors");
 require("dotenv").config();
 var app = express();
@@ -24,6 +26,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/crosswords", crosswordsRouter);
 app.use("/gameTypes", gameTypesRouter);
 app.use("/session", sessionRouter);
+app.use("/tokenURI", tokenURIRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
