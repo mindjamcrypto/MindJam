@@ -8,7 +8,8 @@ router.get("/", async (req, res) => {
   res.send(crosswords);
 });
 router.get("/:id", async (req, res) => {
-  const crossword = await crosswordsData.getCrosswordById();
+  const id = req.params.id;
+  const crossword = await crosswordsData.getCrosswordById(id);
   res.send(crossword);
 });
 

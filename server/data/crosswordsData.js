@@ -1,13 +1,17 @@
 const { Games } = require("../config/mongoCollections");
+const { ObjectId } = require("mongodb");
 
 async function getAllCrosswords() {
   const gamesCollection = await Games();
   const all = await gamesCollection.find({ GameTypeID: 1 }).toArray();
+
   return all;
 }
 async function getCrosswordById(_id) {
   const gamesCollection = await Games();
-  const crossword = await gamesCollection.findOne({ id: _id });
+  //console.log(_id);
+  const crossword = await gamesCollection.findOne({ _id: ObjectId(_id) });
+  //console.log(crossword);
   return crossword;
 }
 
