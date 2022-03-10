@@ -112,7 +112,7 @@ export const Games = () => {
                     to={`/${game["gameTypeName"]}selection`}
                   >
                     <Image
-                      boxSize="184px"
+                      boxSize="200px"
                       src={imageObject[game["gameTypeID"]]}
                     />
                   </Link>
