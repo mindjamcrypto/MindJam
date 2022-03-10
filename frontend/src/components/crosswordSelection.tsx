@@ -51,11 +51,13 @@ export const CrosswordSelection = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        await axios.get("http://localhost:3001/crosswords").then((result) => {
-          console.log(result.data);
-          setCrosswordData(result.data);
-          setLoading(false);
-        });
+        await axios
+          .get("https://mindjam-backend.herokuapp.com/crosswords")
+          .then((result) => {
+            console.log(result.data);
+            setCrosswordData(result.data);
+            setLoading(false);
+          });
       } catch (e) {
         return <Error />;
       }
