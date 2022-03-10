@@ -1,62 +1,44 @@
 import React from "react";
 import { Box, Text, Flex, Heading, Link } from "@chakra-ui/react";
 import { Link as ReactRouter } from "react-router-dom";
+import globeBanner from "../../../constants/images/globeBanner.png";
+import { url } from "inspector";
+import { Logo } from "../../../components/logo";
+import { Header } from "../../../components/header";
 export const Intro = () => {
   return (
-    <Box
-      w="full"
-      bg="#0f3775"
-      px={{
-        base: "50px",
-        md: "100px",
-        xl: "200px",
-      }}
-      py="60px"
-    >
-      <Flex justifyContent="center" alignItems="center">
-        <Heading
-          fontSize={{
-            base: 30,
-            md: 54,
-            xl: 64,
-          }}
-          letterSpacing="6px"
-          color="whiteAlpha.900"
-        >
-          MindJam
-        </Heading>
-      </Flex>
-      <Flex justifyContent="center" alignItems="center" pb="30px">
+    <Box>
+      <Logo />
+      <Box
+        backgroundPosition="center"
+        backgroundImage={`url(${globeBanner})`}
+        backgroundSize={"cover"}
+      >
+        <Header />
         <Box
-          fontSize={{
-            base: 20,
-            md: 30,
-            xl: 40,
+          w="full"
+          px={{
+            base: "50px",
+            md: "100px",
+            xl: "200px",
           }}
-          letterSpacing="6px"
-          color="whiteAlpha.900"
+          py="450px"
         >
-          Mind Games on the Blockchain
+          <Flex justifyContent="center" alignItems="center" marginLeft={"60%"}>
+            <Heading
+              fontSize={{
+                base: 30,
+                md: 40,
+                xl: 50,
+              }}
+              color="whiteAlpha.900"
+              fontWeight={"900"}
+            >
+              Taking your game to the next level on Web3
+            </Heading>
+          </Flex>
         </Box>
-      </Flex>
-      <Flex justifyContent="center" alignItems="center" pb="30px">
-        <Link
-          px={2}
-          py={1}
-          rounded={"md"}
-          bg={"#94fc64"}
-          color={"blackAlpha.900"}
-          fontSize={"30px"}
-          _hover={{
-            textDecoration: "none",
-            bg: "whiteAlpha.900",
-          }}
-          as={ReactRouter}
-          to={"/games"}
-        >
-          Start playing now!
-        </Link>
-      </Flex>
+      </Box>
     </Box>
   );
 };
