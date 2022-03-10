@@ -27,7 +27,7 @@ import metamaskStacked from "../constants/images/metamask-fox-wordmark-stacked.s
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
-import { getSquareHint } from "../actions/CrosswordsActions";
+import { getSquareHint, getWordHint } from "../actions/CrosswordsActions";
 import { mintNFT } from "../utils/nftMinter";
 import { Header } from "./header";
 import { ethers } from "ethers";
@@ -81,6 +81,7 @@ function CrosswordPuzzle() {
   const [checkWordId, setCheckWordId] = useState("");
   const [status, setStatus] = useState("");
   const [success, setSuccess] = useState(false);
+  const [revWordWaiting, setRevWordWaiting] = useState(false);
   const [ethersCrosswordContract, setEthersCrosswordContract] =
     useState<ethers.Contract>();
   const [userSigner, setUserSigner] = useState<ethers.Signer>();
@@ -146,19 +147,16 @@ function CrosswordPuzzle() {
     crossword.current?.setGuess(hint!.row, hint!.col, hint!.letter);
   }, [crosswordData]);
 
-  const fillMultipleCells = useCallback(
-    (event) => {
-      let revWord = crosswordData?.GameData.revealWords[0]; //TODO should the hints be random? how many hints?
-      [...revWord!.word].forEach((letter, i) => {
-        if (revWord!.direction === "across") {
-          crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
-        } else {
-          crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
-        }
-      });
-    },
-    [crosswordData]
-  );
+  const fillMultipleCells = useCallback(() => {
+    let revWord = crosswordData?.GameData.revealWords[0]; //TODO should the hints be random? how many hints?
+    [...revWord!.word].forEach((letter, i) => {
+      if (revWord!.direction === "across") {
+        crossword.current?.setGuess(revWord!.row, revWord!.col + i, letter);
+      } else {
+        crossword.current?.setGuess(revWord!.row + i, revWord!.col, letter);
+      }
+    });
+  }, [crosswordData]);
   const reset = useCallback(
     (event) => {
       crossword.current?.reset();
@@ -175,6 +173,17 @@ function CrosswordPuzzle() {
       crosswordData?.PaidActionObject.square
     ); //hardcoded until we figure out ids
     setSquareWaiting(true);
+  };
+
+  const handleRevealWord = async () => {
+    //make call to smart contract
+
+    const paid = await getWordHint(
+      account,
+      0,
+      crosswordData?.PaidActionObject.word
+    ); //hardcoded until we figure out ids
+    setRevWordWaiting(true);
   };
 
   const handleBeginSession = useCallback(async () => {
@@ -211,7 +220,7 @@ function CrosswordPuzzle() {
   const handleSubmitToSM = async () => {
     setLoading(true);
     setLoadingMsg("Congratulations! You won a free MindJam NFT!");
-    await handleNFTMinting('completor');
+    await handleNFTMinting("completor");
     console.log("Submit to smart contract here");
     setLoading(false);
   };
@@ -251,8 +260,9 @@ function CrosswordPuzzle() {
 
   useEffect(() => {
     // listen for event
-    if (account) {
-      ethersCrosswordContract!.on("RequestSquare", onRequestSquare);
+    if (account && ethersCrosswordContract) {
+      ethersCrosswordContract.on("RequestSquare", onRequestSquare);
+      ethersCrosswordContract.on("RequestWord", onRequestWord);
       console.log("Turning on RequestSquare , & open listener");
     }
     return () => {
@@ -282,6 +292,11 @@ function CrosswordPuzzle() {
     console.log("REVEAL SQUARE EMITTED:", account, "cid:", cid);
     setSquareWaiting(false);
     fillOneCell();
+  };
+  const onRequestWord = async (account: String, cid: number) => {
+    console.log("REVEAL WORD EMITTED:", account, "cid:", cid);
+    setRevWordWaiting(false);
+    fillMultipleCells();
   };
 
   if (!account.length) {
@@ -412,10 +427,18 @@ function CrosswordPuzzle() {
                   ) : (
                     ""
                   )}
-                  <Button onClick={fillMultipleCells}>
+                  <Button onClick={handleRevealWord}>
                     {" "}
                     Reveal Word -{">"} Cost: 15 MJ
                   </Button>
+                  {revWordWaiting ? (
+                    <Flex alignItems={"center"}>
+                      <Text marginRight="2">Revealing </Text>
+                      <Spinner />
+                    </Flex>
+                  ) : (
+                    ""
+                  )}
                   <Button onClick={reset}>Reset</Button>
                 </VStack>
               </Box>
