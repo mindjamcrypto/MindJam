@@ -87,7 +87,6 @@ export const CrosswordSelection = () => {
                 md: 44, // 48em-80em,
                 xl: 54, // 80em+
               }}
-              letterSpacing="6px"
               pb="15px"
             >
               Choose a crossword puzzle!

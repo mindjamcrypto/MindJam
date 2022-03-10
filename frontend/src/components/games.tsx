@@ -7,7 +7,10 @@ import {
   Link,
   Heading,
   Image,
+  Text,
+  VStack,
 } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link as ReactRouter } from "react-router-dom";
 import axios from "axios";
@@ -23,6 +26,24 @@ const imageObject = {
   2: Wordle,
   3: WordSearch,
   4: LearnFrench,
+};
+const wordsObject = {
+  1: {
+    header: "CROSSWORD OF THE DAY",
+    desc: "You have 24 hours to complete and submit this CROSSWORD",
+  },
+  2: {
+    header: "WORDLY",
+    desc: "You have 24 hours to completethe WORDLY game. The quickest time wins",
+  },
+  3: {
+    header: "WORD PUZZLE",
+    desc: "You have 24 hours to complete the WORD PUZZLE game. The quickest time wins",
+  },
+  4: {
+    header: "LEARN FRENCH",
+    desc: "You have 24 hours to complete the learn  game. The quickest time wins",
+  },
 };
 
 export const Games = () => {
@@ -62,20 +83,28 @@ export const Games = () => {
           py="60px"
         >
           <Flex justifyContent="center" alignItems="center">
-            <Heading
-              fontSize={{
-                base: 20, // 0-48em
-                md: 44, // 48em-80em,
-                xl: 54, // 80em+
-              }}
-              letterSpacing="6px"
-              pb="15px"
-            >
-              Choose a game!
-            </Heading>
+            <VStack>
+              <Heading
+                fontSize={{
+                  base: 20, // 0-48em
+                  md: 44, // 48em-80em,
+                  xl: 54, // 80em+
+                }}
+                pb="15px"
+              >
+                START YOUR GAME NOW!
+              </Heading>
+              <Text textAlign={"center"}>
+                WIN MINDJAM TOKENS
+                <br />
+                CONNECT YOUR METAMASK WALLET
+                <br />
+                REVEAL CLUES TO SPEED UP YOUR GAME
+              </Text>
+            </VStack>
           </Flex>
-          <Flex justifyContent="center" alignItems="center">
-            <Grid templateColumns="repeat(2, 1fr)" gap={12}>
+          <Flex justifyContent="center" alignItems="center" pt={"40px"}>
+            <Grid templateColumns="repeat(4, 1fr)" gap={12}>
               {gameTypeList?.map((game) => (
                 <GridItem key={game["gameTypeName"]}>
                   <Link
@@ -83,10 +112,26 @@ export const Games = () => {
                     to={`/${game["gameTypeName"]}selection`}
                   >
                     <Image
-                      boxSize="150px"
+                      boxSize="184px"
                       src={imageObject[game["gameTypeID"]]}
                     />
                   </Link>
+                  <Flex justifyContent="center" alignItems="center">
+                    <ChevronDownIcon boxSize={"80px"} />
+                  </Flex>
+                  <Box bg={"#0189ca"} boxSize={"200px"}>
+                    <Text
+                      textColor="whiteAlpha.900"
+                      textAlign={"center"}
+                      pt="40px"
+                      fontWeight={"900"}
+                    >
+                      {wordsObject[game["gameTypeID"]]["header"]}
+                    </Text>
+                    <Text textColor={"whiteAlpha.800"} textAlign={"center"}>
+                      {wordsObject[game["gameTypeID"]]["desc"]}
+                    </Text>
+                  </Box>
                 </GridItem>
               ))}
             </Grid>
