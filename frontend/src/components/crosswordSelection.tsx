@@ -92,15 +92,20 @@ export const CrosswordSelection = () => {
               }}
               pb="15px"
             >
-              Choose a crossword puzzle!
+              Choose a Crossword Puzzle!
             </Heading>
           </Flex>
           <Flex justifyContent="center" alignItems="center">
-            <Grid templateColumns="repeat(4, 1fr)" gap={12}>
+            <Grid templateColumns="repeat(2, 1fr)" gap={12}>
               {crosswordData?.map((puzzle) => (
                 <GridItem key={puzzle._id}>
-                  <Button>
-                    <Link as={ReactRouter} to={`/crossword/${puzzle._id}`}>
+                  <Button bg={"#0189ca"} boxSize={"200px"} maxH={"100px"}>
+                    <Link
+                      as={ReactRouter}
+                      to={`/crossword/${puzzle._id}`}
+                      color={"whiteAlpha.900"}
+                      fontSize={"35px"}
+                    >
                       {puzzle.GameData.title}
                     </Link>
                   </Button>

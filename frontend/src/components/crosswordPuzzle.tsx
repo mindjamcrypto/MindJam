@@ -17,10 +17,13 @@ import {
   NumberInputStepper,
   Text,
   Spinner,
+  Image,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { crosswordList } from "../constants/dummyData/crosswordList";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import metamaskHorizontal from "../constants/images/metamask-fox-wordmark-horizontal.svg";
+import metamaskStacked from "../constants/images/metamask-fox-wordmark-stacked.svg";
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
@@ -285,8 +288,31 @@ function CrosswordPuzzle() {
         <Box bg={"#09245e"}>
           <Header />
         </Box>
+
         <Flex justifyContent="center" alignItems="center" height="800px">
-          <Button onClick={handleSubmit}>Connect Wallet</Button>
+          <VStack>
+            <Box bg={"#0189ca"} boxSize={"200px"}>
+              <Text
+                textColor="whiteAlpha.900"
+                textAlign={"center"}
+                py="55px"
+                fontWeight={"900"}
+                px="20px"
+              >
+                Please connect your MetaMask wallet to continue to the game!
+              </Text>
+              <Text textColor={"whiteAlpha.800"} textAlign={"center"}></Text>
+            </Box>
+            <ChevronDownIcon boxSize={"50px"} />
+            <Button
+              onClick={handleSubmit}
+              bg={"blackAlpha.600"}
+              boxSize={"175px"}
+              maxH={"55px"}
+            >
+              <Image src={metamaskHorizontal} />
+            </Button>
+          </VStack>
         </Flex>
       </Box>
     );
@@ -298,11 +324,16 @@ function CrosswordPuzzle() {
         </Box>
         <Flex justifyContent="center" alignItems="center" height="800px">
           <VStack>
-            <Button fontSize={15} letterSpacing="1.5px">
-              Connected: {account.substring(2, 6)} ...
-              {account.substring(37, 41)}
+            <Button fontSize={15} size={"lg"} bg={"blackAlpha.600"}>
+              <Image src={metamaskStacked} boxSize={"60px"} />
+              <Text pt={"6px"}>
+                Connected: {account.substring(2, 6)} ...
+                {account.substring(37, 41)}
+              </Text>
             </Button>
-            <Button onClick={handleBeginSession}>Begin Session</Button>{" "}
+            <Button onClick={handleBeginSession} bg={"#0189ca"}>
+              <Text color={"whiteAlpha.900"}>Begin Session</Text>
+            </Button>{" "}
           </VStack>
         </Flex>
       </Box>
