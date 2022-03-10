@@ -80,6 +80,7 @@ function CrosswordPuzzle() {
   const [correctWordArray, setCorrectWordArray] = useState<Array<string>>([]);
   const [checkWordId, setCheckWordId] = useState("");
   const [status, setStatus] = useState("");
+  const [success, setSuccess] = useState(false);
   const [ethersCrosswordContract, setEthersCrosswordContract] =
     useState<ethers.Contract>();
   const [userSigner, setUserSigner] = useState<ethers.Signer>();
@@ -224,8 +225,9 @@ function CrosswordPuzzle() {
   };
   const handleNFTMinting = async (nftType: String) => {
     //TODO: implement
-    const { status } = await mintNFT(nftType);
+    const { success, status } = await mintNFT(nftType);
     setStatus(status);
+    setSuccess(success);
   };
 
   useEffect(() => {
@@ -420,20 +422,45 @@ function CrosswordPuzzle() {
             </HStack>
           </Flex>
           {isCorrect ? (
-            <>
-            <Flex
-              justifyContent="center"
-              alignItems="center"
-              pt={"10px"}
-              height="700px"
-            >
-              <Button w="50%" colorScheme="green" onClick={handleSubmitToSM} >
-                Submit!
-              </Button>
-              <Text fontSize='md' id="status">        {status}      </Text>
-            </Flex>
-
-            </>
+            success ? (
+              <Flex
+                justifyContent="center"
+                alignItems="center"
+                pt={"10px"}
+                height="700px"
+              >
+                <Text
+                  textColor="whiteAlpha.900"
+                  textAlign={"center"}
+                  fontWeight={"900"}
+                  pt={"10px"}
+                  bg={"#0189ca"}
+                  width={"60%"}
+                >
+                  {status}
+                </Text>
+              </Flex>
+            ) : (
+              <>
+                <Flex
+                  justifyContent="center"
+                  alignItems="center"
+                  pt={"10px"}
+                  height="700px"
+                >
+                  <Button
+                    w="50%"
+                    colorScheme="green"
+                    onClick={handleSubmitToSM}
+                  >
+                    Submit!
+                  </Button>
+                  <Text fontSize="md" id="status">
+                    {status}
+                  </Text>
+                </Flex>
+              </>
+            )
           ) : (
             ""
           )}
