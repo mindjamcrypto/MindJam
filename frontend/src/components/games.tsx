@@ -53,9 +53,11 @@ export const Games = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        await axios.get("http://localhost:3001/gameTypes/").then((result) => {
-          setGameTypeList(result.data);
-        });
+        await axios
+          .get("https://mindjam-backend.herokuapp.com/gameTypes/")
+          .then((result) => {
+            setGameTypeList(result.data);
+          });
         setLoading(false);
       } catch (e) {
         return <Error />;

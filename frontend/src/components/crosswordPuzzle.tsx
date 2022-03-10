@@ -105,7 +105,7 @@ function CrosswordPuzzle() {
       const endTime = Date.now();
       if (crosswordData) {
         console.log("UPDATING SESSION WITH END TIME");
-        await axios.post("http://localhost:3001/session/end", {
+        await axios.post("https://mindjam-backend.herokuapp.com/session/end", {
           params: {
             endTime: endTime,
             gameID: crosswordData._id,
@@ -177,12 +177,15 @@ function CrosswordPuzzle() {
     const startTime = Date.now();
     // if there is not a session in the database already
     console.log(crosswordData?._id);
-    const hasSession = await axios.get("http://localhost:3001/session/check", {
-      params: {
-        gameID: crosswordData?._id,
-        account: account,
-      },
-    });
+    const hasSession = await axios.get(
+      "https://mindjam-backend.herokuapp.com/session/check",
+      {
+        params: {
+          gameID: crosswordData?._id,
+          account: account,
+        },
+      }
+    );
     console.log(hasSession);
     if (hasSession.data) {
       //already started session so do not add another doc
@@ -190,7 +193,7 @@ function CrosswordPuzzle() {
       setSessionStart(true);
     } else {
       console.log("CREATING NEW SESSION");
-      await axios.post("http://localhost:3001/session/start", {
+      await axios.post("https://mindjam-backend.herokuapp.com/session/start", {
         params: {
           startTime: startTime,
           gameID: crosswordData!._id,
@@ -216,16 +219,17 @@ function CrosswordPuzzle() {
       alert("Try Again!");
     }
   };
-  const handleNFTMinting = async (nftType:String) => { //TODO: implement
-    const {status} = await mintNFT(nftType);
+  const handleNFTMinting = async (nftType: String) => {
+    //TODO: implement
+    const { status } = await mintNFT(nftType);
     setStatus(status);
-    };
+  };
 
   useEffect(() => {
     async function fetchData() {
       try {
         await axios
-          .get("http://localhost:3001/crosswords/" + id)
+          .get("https://mindjam-backend.herokuapp.com/crosswords/" + id)
           .then((result) => {
             setCrosswordData(result.data);
           });
