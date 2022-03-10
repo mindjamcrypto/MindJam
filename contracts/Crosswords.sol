@@ -31,6 +31,9 @@ contract Crosswords is ReentrancyGuard {
 
     event RequestSquare(address from, uint256 crosswordId);
     event RequestWord(address from, uint256 crosswordId);
+    event NewCrossword(address from, uint256 id);
+    event WinnerPaid(address winner, uint256 amount);
+    event SessionEnded(uint256 id, uint256 time, address player);
 
     constructor(address _tokenAddress) {
         owner = msg.sender;
@@ -38,7 +41,7 @@ contract Crosswords is ReentrancyGuard {
     }
 
     /**
-     * @dev Creates new crossword specifying the prices
+     * @dev Creates new crossword specifying the prices, emits NewCrossword event
      * @param _squarePrice Number of tokens required to request an hint
      * @param _wordPrice Number of tokens required to reveal a word
      * @param _challengePrize Number of tokens to be minted to who wins the 24 hour challenge
@@ -62,6 +65,7 @@ contract Crosswords is ReentrancyGuard {
                 0 // record time initialized to 0
             )
         );
+        emit NewCrossword(msg.sender, id);
     }
 
     /**
@@ -151,6 +155,7 @@ contract Crosswords is ReentrancyGuard {
             return true;
         }
         return false;
+        emit SessionEnded(_id, _time, _player);
     }
 
     /**@dev Returns the address of the winner
@@ -176,6 +181,7 @@ contract Crosswords is ReentrancyGuard {
         crosswords[_id].winnerPaid = true;
         bool sent = mjToken.transfer(msg.sender, crossword.challengePrize);
         require(sent, "Transaction rejected");
+        emit WinnerPaid(msg.sender, crossword.challengePrize);
     }
 
     /**@dev Withdraw all the mJTokens to specified address
