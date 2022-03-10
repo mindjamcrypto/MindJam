@@ -196,7 +196,7 @@ function CrosswordPuzzle() {
 
   const handleSubmitToSM = async () => {
     setLoading(true);
-    setLoadingMsg("Congratulations! We are minting your free NFT!");
+    setLoadingMsg("Congratulations! You won a free MindJam NFT!");
     await handleNFTMinting('completor');
     console.log("Submit to smart contract here");
     setLoading(false);
@@ -230,7 +230,7 @@ function CrosswordPuzzle() {
     if (id) {
       fetchData();
     }
-    setIsCorrectValue(true); //testing==================
+    //setIsCorrectValue(true); //testing==================
   }, [id]);
 
   if (!account.length) {
@@ -330,6 +330,7 @@ function CrosswordPuzzle() {
             </HStack>
           </Flex>
           {isCorrect ? (
+            <>
             <Flex
               justifyContent="center"
               alignItems="center"
@@ -341,6 +342,8 @@ function CrosswordPuzzle() {
               </Button>
               <Text fontSize='md' id="status">        {status}      </Text>
             </Flex>
+
+            </>
           ) : (
             ""
           )}
