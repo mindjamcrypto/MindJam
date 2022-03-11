@@ -361,153 +361,154 @@ function CrosswordPuzzle() {
     if (crosswordData) {
       return (
         <Box>
-          <Box bg={"#09245e"}>
-            <Header />
-          </Box>
-          <Flex justifyContent="center" alignItems="center" pt={"20px"}>
-            <HStack>
-              <Box boxSize={"sm"}>
-                <Flex justifyContent="center" alignItems="center" pt={"20px"}>
-                  <Heading
-                    fontSize={{
-                      base: 10, // 0-48em
-                      md: 20, // 48em-80em,
-                      xl: 30, // 80em+
-                    }}
-                  >
-                    {crosswordData.GameData.title}
-                  </Heading>
-                </Flex>
-                <Crossword
-                  ref={crossword}
-                  onCrosswordCorrect={onCrosswordCorrect}
-                  onCorrect={onCorrect}
-                  onAnswerIncorrect={onAnswerIncorrect}
-                  data={crosswordData.GameData}
-                />
-              </Box>
-              <Box boxSize={"sm"} pt={"80px"}>
-                <VStack>
-                  <FormControl w="70%">
-                    <NumberInput
-                      max={520}
-                      min={0}
-                      onChange={(valueString) => setCheckWordId(valueString)}
+          <Box>
+            <Box bg={"#09245e"}>
+              <Header />
+            </Box>
+            <Flex justifyContent="center" alignItems="center" pt={"20px"}>
+              <HStack>
+                <Box boxSize={"sm"}>
+                  <Flex justifyContent="center" alignItems="center" pt={"20px"}>
+                    <Heading
+                      fontSize={{
+                        base: 10, // 0-48em
+                        md: 20, // 48em-80em,
+                        xl: 30, // 80em+
+                      }}
                     >
-                      <NumberInputField id="amount" placeholder="0" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </FormControl>
+                      {crosswordData.GameData.title}
+                    </Heading>
+                  </Flex>
+                  <VStack>
+                    <Crossword
+                      ref={crossword}
+                      onCrosswordCorrect={onCrosswordCorrect}
+                      onCorrect={onCorrect}
+                      onAnswerIncorrect={onAnswerIncorrect}
+                      data={crosswordData.GameData}
+                    />
+                    {isCorrect ? (
+                      success ? (
+                        <Flex
+                          justifyContent="center"
+                          alignItems="center"
+                          pt={"10px"}
+                        >
+                          <Text
+                            textColor="whiteAlpha.900"
+                            textAlign={"center"}
+                            fontWeight={"900"}
+                            pt={"10px"}
+                            bg={"#0189ca"}
+                            width={"60%"}
+                          >
+                            {status}
+                          </Text>
+                        </Flex>
+                      ) : (
+                        <>
+                          <Button
+                            colorScheme="green"
+                            onClick={handleSubmitToSM}
+                            w={"100%"}
+                          >
+                            Submit!
+                          </Button>
+                          <Text fontSize="md" id="status">
+                            {status}
+                          </Text>
+                        </>
+                      )
+                    ) : (
+                      ""
+                    )}
+                  </VStack>
+                </Box>
+                <Box boxSize={"sm"} pt={"80px"}>
+                  <VStack>
+                    <FormControl w="70%">
+                      <NumberInput
+                        max={520}
+                        min={0}
+                        onChange={(valueString) => setCheckWordId(valueString)}
+                      >
+                        <NumberInputField id="amount" placeholder="0" />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                    </FormControl>
 
-                  <Button
-                    onClick={handleCheckWord}
-                    bg={"#0189ca"}
-                    size={"md"}
-                    w={"70%"}
-                  >
-                    <Text color={"whiteAlpha.900"}>Check Word</Text>
-                  </Button>
-                  <Heading
-                    fontSize={{
-                      base: 10, // 0-48em
-                      md: 20, // 48em-80em,
-                      xl: 30, // 80em+
-                    }}
-                    pt={"20px"}
-                    pb={"20px"}
-                  >
-                    Get Help
-                  </Heading>
-                  <Button
-                    onClick={handleRevealLetter}
-                    bg={"#0189ca"}
-                    size={"md"}
-                    w={"70%"}
-                  >
-                    <Text color={"whiteAlpha.900"}>
-                      Reveal Square -{">"} Cost: 10 MJ
-                    </Text>
-                  </Button>
-                  {squareWaiting ? (
-                    <Flex alignItems={"center"}>
-                      <Text marginRight="2">Revealing </Text>
-                      <Spinner />
-                    </Flex>
-                  ) : (
-                    ""
-                  )}
-                  <Button
-                    onClick={handleRevealWord}
-                    bg={"#0189ca"}
-                    size={"md"}
-                    w={"70%"}
-                  >
-                    {" "}
-                    <Text color={"whiteAlpha.900"}>
-                      Reveal Word -{">"} Cost: 15 MJ
-                    </Text>
-                  </Button>
-                  {revWordWaiting ? (
-                    <Flex alignItems={"center"}>
-                      <Text marginRight="2">Revealing </Text>
-                      <Spinner />
-                    </Flex>
-                  ) : (
-                    ""
-                  )}
-                  <Button onClick={reset} bg={"#0189ca"} size={"md"} w={"70%"}>
-                    <Text color={"whiteAlpha.900"}>Reset Crossword</Text>
-                  </Button>
-                </VStack>
-              </Box>
-            </HStack>
-          </Flex>
-          {isCorrect ? (
-            success ? (
-              <Flex
-                justifyContent="center"
-                alignItems="center"
-                pt={"10px"}
-                height="700px"
-              >
-                <Text
-                  textColor="whiteAlpha.900"
-                  textAlign={"center"}
-                  fontWeight={"900"}
-                  pt={"10px"}
-                  bg={"#0189ca"}
-                  width={"60%"}
-                >
-                  {status}
-                </Text>
-              </Flex>
-            ) : (
-              <>
-                <Flex
-                  justifyContent="center"
-                  alignItems="center"
-                  pt={"10px"}
-                  height="700px"
-                >
-                  <Button
-                    w="50%"
-                    colorScheme="green"
-                    onClick={handleSubmitToSM}
-                  >
-                    Submit!
-                  </Button>
-                  <Text fontSize="md" id="status">
-                    {status}
-                  </Text>
-                </Flex>
-              </>
-            )
-          ) : (
-            ""
-          )}
+                    <Button
+                      onClick={handleCheckWord}
+                      bg={"#0189ca"}
+                      size={"md"}
+                      w={"70%"}
+                    >
+                      <Text color={"whiteAlpha.900"}>Check Word</Text>
+                    </Button>
+                    <Heading
+                      fontSize={{
+                        base: 10, // 0-48em
+                        md: 20, // 48em-80em,
+                        xl: 30, // 80em+
+                      }}
+                      pt={"20px"}
+                      pb={"20px"}
+                    >
+                      Get Help
+                    </Heading>
+                    <Button
+                      onClick={handleRevealLetter}
+                      bg={"#0189ca"}
+                      size={"md"}
+                      w={"70%"}
+                    >
+                      <Text color={"whiteAlpha.900"}>
+                        Reveal Square -{">"} Cost: 10 MJ
+                      </Text>
+                    </Button>
+                    {squareWaiting ? (
+                      <Flex alignItems={"center"}>
+                        <Text marginRight="2">Revealing </Text>
+                        <Spinner />
+                      </Flex>
+                    ) : (
+                      ""
+                    )}
+                    <Button
+                      onClick={handleRevealWord}
+                      bg={"#0189ca"}
+                      size={"md"}
+                      w={"70%"}
+                    >
+                      {" "}
+                      <Text color={"whiteAlpha.900"}>
+                        Reveal Word -{">"} Cost: 15 MJ
+                      </Text>
+                    </Button>
+                    {revWordWaiting ? (
+                      <Flex alignItems={"center"}>
+                        <Text marginRight="2">Revealing </Text>
+                        <Spinner />
+                      </Flex>
+                    ) : (
+                      ""
+                    )}
+                    <Button
+                      onClick={reset}
+                      bg={"#0189ca"}
+                      size={"md"}
+                      w={"70%"}
+                    >
+                      <Text color={"whiteAlpha.900"}>Reset Crossword</Text>
+                    </Button>
+                  </VStack>
+                </Box>
+              </HStack>
+            </Flex>
+          </Box>
         </Box>
       );
     } else {
