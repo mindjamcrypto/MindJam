@@ -24,6 +24,8 @@ import axios from "axios";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import metamaskHorizontal from "../constants/images/metamask-fox-wordmark-horizontal.svg";
 import metamaskStacked from "../constants/images/metamask-fox-wordmark-stacked.svg";
+import tokenIcon from "../constants/images/tokenIcon.svg";
+
 import { ClueTypeOriginal } from "@jaredreisinger/react-crossword/dist/types";
 import { Error } from "../components/error";
 import { Loading } from "../components/loading";
@@ -427,9 +429,10 @@ function CrosswordPuzzle() {
                     size={"md"}
                     w={"70%"}
                   >
-                    <Text color={"whiteAlpha.900"}>
-                      Reveal Square -{">"} Cost: 10 MJ
+                    <Text color={"whiteAlpha.900"} pt={"2px"}>
+                      Reveal Square -{">"} Cost: 10
                     </Text>
+                    <Image boxSize="30px" src={tokenIcon} />
                   </Button>
                   {squareWaiting ? (
                     <Flex alignItems={"center"}>
@@ -445,10 +448,10 @@ function CrosswordPuzzle() {
                     size={"md"}
                     w={"70%"}
                   >
-                    {" "}
-                    <Text color={"whiteAlpha.900"}>
-                      Reveal Word -{">"} Cost: 15 MJ
+                    <Text color={"whiteAlpha.900"} pt={"2px"}>
+                      Reveal Word -{">"} Cost: 15
                     </Text>
+                    <Image boxSize="30px" src={tokenIcon} />
                   </Button>
                   {revWordWaiting ? (
                     <Flex alignItems={"center"}>
