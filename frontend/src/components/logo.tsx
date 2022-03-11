@@ -10,13 +10,13 @@ export const Logo = () => {
           <Image
             boxSize={{
               base: "100px",
-              md: "150px",
+              md: "125px",
               xl: "200px",
             }}
             src={levelUp}
             marginBottom={{
               base: "-100px",
-              md: "-150px",
+              md: "-125px",
               xl: "-200px",
             }}
           />

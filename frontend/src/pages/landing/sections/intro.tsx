@@ -8,7 +8,6 @@ import { Header } from "../../../components/header";
 export const Intro = () => {
   return (
     <Box>
-      <Logo />
       <Box
         backgroundPosition="center"
         backgroundImage={`url(${globeBanner})`}

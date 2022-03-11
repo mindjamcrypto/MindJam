@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link as ReactRouter } from "react-router-dom";
-import levelUp from "../constants/images/levelUp.png";
+import { Logo } from "../components/logo";
 declare var window: any;
 const Links = ["GAMES", "CREATE", "TEAM"];
 
@@ -41,6 +41,7 @@ export const Header = () => {
   return (
     <>
       <Box>
+        <Logo />
         <Flex h={16}>
           <IconButton
             size={"md"}

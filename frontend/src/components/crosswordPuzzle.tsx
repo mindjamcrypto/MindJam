@@ -374,7 +374,6 @@ function CrosswordPuzzle() {
                       md: 20, // 48em-80em,
                       xl: 30, // 80em+
                     }}
-                    letterSpacing="6px"
                   >
                     {crosswordData.GameData.title}
                   </Heading>
@@ -389,13 +388,13 @@ function CrosswordPuzzle() {
               </Box>
               <Box boxSize={"sm"} pt={"80px"}>
                 <VStack>
-                  <FormControl w="50%">
+                  <FormControl w="70%">
                     <NumberInput
                       max={520}
                       min={0}
                       onChange={(valueString) => setCheckWordId(valueString)}
                     >
-                      <NumberInputField id="amount" placeholder="1" />
+                      <NumberInputField id="amount" placeholder="0" />
                       <NumberInputStepper>
                         <NumberIncrementStepper />
                         <NumberDecrementStepper />
@@ -403,21 +402,34 @@ function CrosswordPuzzle() {
                     </NumberInput>
                   </FormControl>
 
-                  <Button onClick={handleCheckWord}>Check Word</Button>
+                  <Button
+                    onClick={handleCheckWord}
+                    bg={"#0189ca"}
+                    size={"md"}
+                    w={"70%"}
+                  >
+                    <Text color={"whiteAlpha.900"}>Check Word</Text>
+                  </Button>
                   <Heading
                     fontSize={{
                       base: 10, // 0-48em
                       md: 20, // 48em-80em,
                       xl: 30, // 80em+
                     }}
-                    letterSpacing="2px"
                     pt={"20px"}
                     pb={"20px"}
                   >
                     Get Help
                   </Heading>
-                  <Button onClick={handleRevealLetter}>
-                    Reveal Square -{">"} Cost: 10 MJ
+                  <Button
+                    onClick={handleRevealLetter}
+                    bg={"#0189ca"}
+                    size={"md"}
+                    w={"70%"}
+                  >
+                    <Text color={"whiteAlpha.900"}>
+                      Reveal Square -{">"} Cost: 10 MJ
+                    </Text>
                   </Button>
                   {squareWaiting ? (
                     <Flex alignItems={"center"}>
@@ -427,9 +439,16 @@ function CrosswordPuzzle() {
                   ) : (
                     ""
                   )}
-                  <Button onClick={handleRevealWord}>
+                  <Button
+                    onClick={handleRevealWord}
+                    bg={"#0189ca"}
+                    size={"md"}
+                    w={"70%"}
+                  >
                     {" "}
-                    Reveal Word -{">"} Cost: 15 MJ
+                    <Text color={"whiteAlpha.900"}>
+                      Reveal Word -{">"} Cost: 15 MJ
+                    </Text>
                   </Button>
                   {revWordWaiting ? (
                     <Flex alignItems={"center"}>
@@ -439,7 +458,9 @@ function CrosswordPuzzle() {
                   ) : (
                     ""
                   )}
-                  <Button onClick={reset}>Reset</Button>
+                  <Button onClick={reset} bg={"#0189ca"} size={"md"} w={"70%"}>
+                    <Text color={"whiteAlpha.900"}>Reset Crossword</Text>
+                  </Button>
                 </VStack>
               </Box>
             </HStack>
